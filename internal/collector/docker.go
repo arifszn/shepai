@@ -66,57 +66,130 @@ func (d *DockerCollector) GetSnapshot() ([]models.LogEvent, error) {
 }
 
 // Start begins streaming logs from the container
+// It will automatically reconnect if the container is restarted (with the same name)
 func (d *DockerCollector) Start(ch chan<- models.LogEvent) error {
-	ctx := context.Background()
+	go d.streamWithReconnect(ch)
+	return nil
+}
 
-	options := types.ContainerLogsOptions{
-		ShowStdout: true,
-		ShowStderr: true,
-		Tail:       "0",
-		Timestamps: true,
-		Follow:     true,
-	}
+// streamWithReconnect handles streaming with automatic reconnection on container restart
+func (d *DockerCollector) streamWithReconnect(ch chan<- models.LogEvent) {
+	reconnectDelay := 2 * time.Second
+	maxReconnectDelay := 30 * time.Second
 
-	reader, err := d.client.ContainerLogs(ctx, d.containerName, options)
-	if err != nil {
-		return fmt.Errorf("failed to stream container logs: %w", err)
-	}
-
-	go func() {
-		defer reader.Close()
-
-		scanner := io.Reader(reader)
-		buf := make([]byte, 8192)
-
-		for {
-			select {
-			case <-d.stopChan:
-				return
-			default:
-				n, err := scanner.Read(buf)
-				if err != nil {
-					if err == io.EOF {
-						time.Sleep(500 * time.Millisecond)
-						continue
-					}
-					return
+	for {
+		select {
+		case <-d.stopChan:
+			return
+		default:
+			// Check if container exists and is running before attempting to stream
+			ctx := context.Background()
+			containerInfo, err := d.client.ContainerInspect(ctx, d.containerName)
+			if err != nil {
+				// Container not found - send error message and wait
+				ch <- models.LogEvent{
+					Timestamp: time.Now(),
+					Source:    "docker",
+					Stream:    "stderr",
+					Message:   fmt.Sprintf("[shepai] Container '%s' not found. Waiting for container to start...", d.containerName),
 				}
+				time.Sleep(reconnectDelay)
+				if reconnectDelay < maxReconnectDelay {
+					reconnectDelay *= 2
+				}
+				continue
+			}
 
-				if n > 0 {
-					events := d.parseDockerLogChunk(buf[:n])
-					for _, event := range events {
-						select {
-						case ch <- event:
-						case <-d.stopChan:
-							return
-						}
+			// Check if container is actually running (not just exists)
+			if !containerInfo.State.Running {
+				// Container exists but is not running
+				ch <- models.LogEvent{
+					Timestamp: time.Now(),
+					Source:    "docker",
+					Stream:    "stderr",
+					Message:   fmt.Sprintf("[shepai] Container '%s' is not running (status: %s). Waiting for container to start...", d.containerName, containerInfo.State.Status),
+				}
+				time.Sleep(reconnectDelay)
+				if reconnectDelay < maxReconnectDelay {
+					reconnectDelay *= 2
+				}
+				continue
+			}
+
+			// Reset reconnect delay on successful connection
+			reconnectDelay = 2 * time.Second
+
+			// Container exists, start streaming
+			options := types.ContainerLogsOptions{
+				ShowStdout: true,
+				ShowStderr: true,
+				Tail:       "0",
+				Timestamps: true,
+				Follow:     true,
+			}
+
+			reader, err := d.client.ContainerLogs(ctx, d.containerName, options)
+			if err != nil {
+				// Failed to get logs - container might be stopping/restarting
+				ch <- models.LogEvent{
+					Timestamp: time.Now(),
+					Source:    "docker",
+					Stream:    "stderr",
+					Message:   fmt.Sprintf("[shepai] Failed to stream logs from container '%s': %v. Retrying...", d.containerName, err),
+				}
+				time.Sleep(reconnectDelay)
+				continue
+			}
+
+			// Stream logs until connection is lost
+			streamErr := d.streamLogs(reader, ch)
+			reader.Close()
+
+			if streamErr != nil && streamErr != io.EOF {
+				// Connection lost - container might have stopped/restarted
+				ch <- models.LogEvent{
+					Timestamp: time.Now(),
+					Source:    "docker",
+					Stream:    "stderr",
+					Message:   fmt.Sprintf("[shepai] Connection to container '%s' lost. Attempting to reconnect...", d.containerName),
+				}
+			}
+
+			// Wait before reconnecting
+			time.Sleep(reconnectDelay)
+			if reconnectDelay < maxReconnectDelay {
+				reconnectDelay *= 2
+			}
+		}
+	}
+}
+
+// streamLogs reads and parses logs from the Docker log stream
+func (d *DockerCollector) streamLogs(reader io.Reader, ch chan<- models.LogEvent) error {
+	buf := make([]byte, 8192)
+
+	for {
+		select {
+		case <-d.stopChan:
+			return nil
+		default:
+			n, err := reader.Read(buf)
+			if err != nil {
+				return err
+			}
+
+			if n > 0 {
+				events := d.parseDockerLogChunk(buf[:n])
+				for _, event := range events {
+					select {
+					case ch <- event:
+					case <-d.stopChan:
+						return nil
 					}
 				}
 			}
 		}
-	}()
-
-	return nil
+	}
 }
 
 // Stop stops the collector
