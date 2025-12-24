@@ -22,58 +22,29 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 
 ## Installation
 
-### Quick Install (Recommended)
+### macOS & Linux
 
-**macOS & Linux - One-line install:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash
 ```
 
-This script automatically detects your platform and installs the latest version.
+### Windows
 
-**Manual installation:**
-
-Download the pre-built binary for your platform from the [latest release](https://github.com/arifszn/shepai/releases/latest):
-
-**macOS (Apple Silicon):**
-```bash
-curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-darwin-arm64 -o shepai
-chmod +x shepai
-sudo mv shepai /usr/local/bin/
-```
-
-**macOS (Intel):**
-```bash
-curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-darwin-amd64 -o shepai
-chmod +x shepai
-sudo mv shepai /usr/local/bin/
-```
-
-**Linux (AMD64):**
-```bash
-curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-linux-amd64 -o shepai
-chmod +x shepai
-sudo mv shepai /usr/local/bin/
-```
-
-**Linux (ARM64):**
-```bash
-curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-linux-arm64 -o shepai
-chmod +x shepai
-sudo mv shepai /usr/local/bin/
-```
-
-**Windows:**
 1. Download `shepai.exe` from the [latest release](https://github.com/arifszn/shepai/releases/latest)
-2. Run it directly from the download folder:
+2. Run it directly from the download folder
 
 ```powershell
 .\shepai.exe file storage\logs\laravel.log
 ```
 
-**Verify installation:**
+#### Verify installation
+
 ```bash
+# macOS/Linux
 shepai --version
+
+# Windows
+.\shepai.exe --version
 ```
 
 Want to build from source? See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
