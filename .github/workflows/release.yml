@@ -57,7 +57,7 @@ jobs:
         GOARCH: ${{ matrix.goarch }}
       run: |
         BINARY_NAME=shepai${{ matrix.ext }}
-        go build -o $BINARY_NAME ./cmd/shepai
+        go build -ldflags="-s -w" -o $BINARY_NAME ./cmd/shepai
         mkdir -p release
         if [ "${{ matrix.goos }}" = "windows" ]; then
           mv $BINARY_NAME release/shepai.exe

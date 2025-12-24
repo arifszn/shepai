@@ -30,7 +30,7 @@ jobs:
       run: cd frontend && npm run build
     
     - name: Build Go binary
-      run: go build -o shepai ./cmd/shepai
+      run: go build -ldflags="-s -w" -o shepai ./cmd/shepai
     
     - name: Verify binary
       run: |
