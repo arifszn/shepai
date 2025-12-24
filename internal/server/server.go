@@ -27,7 +27,7 @@ var upgrader = websocket.Upgrader{
 		// Only allow localhost connections for security
 		origin := r.Header.Get("Origin")
 		host := r.Host
-		
+
 		// Extract hostname from origin if present
 		if origin != "" {
 			// Parse origin URL
@@ -53,7 +53,7 @@ var upgrader = websocket.Upgrader{
 				}
 			}
 		}
-		
+
 		// Fallback: check Host header
 		hostname := host
 		if idx := len(host); idx > 0 {
@@ -70,20 +70,36 @@ var upgrader = websocket.Upgrader{
 
 // Server manages the HTTP and WebSocket server
 type Server struct {
-	port      int
-	collector models.LogCollector
-	clients   map[*websocket.Conn]bool
-	mu        sync.RWMutex
-	eventChan chan models.LogEvent
-	snapshot  []models.LogEvent
+	port       int
+	collector  models.LogCollector
+	clients    map[*websocket.Conn]bool
+	mu         sync.RWMutex
+	eventChan  chan models.LogEvent
+	snapshot   []models.LogEvent
 	snapshotMu sync.RWMutex
 }
 
 // isPortAvailable checks if a port is available for binding
+// It tries to connect to the port first to see if something is already listening,
+// then tries to bind to ensure we can use it
 func isPortAvailable(port int) bool {
 	addr := fmt.Sprintf("127.0.0.1:%d", port)
+
+	// First, try to connect to see if something is already listening
+	// This catches cases where a process is listening on *:port (all interfaces)
+	// which might allow binding to 127.0.0.1:port on some systems
+	conn, err := net.DialTimeout("tcp", addr, 200*time.Millisecond)
+	if err == nil {
+		// Something is already listening on this port
+		conn.Close()
+		return false
+	}
+
+	// If connection failed (nothing listening), try to bind to the port
+	// This is the definitive test - if we can bind, the port is available
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
+		// Port is not available (likely already in use)
 		return false
 	}
 	ln.Close()
@@ -95,14 +111,14 @@ func isPortAvailable(port int) bool {
 func findAvailablePort(preferredPort int) int {
 	port := preferredPort
 	maxPort := preferredPort + 100 // Limit search to 100 ports ahead
-	
+
 	for port <= maxPort {
 		if isPortAvailable(port) {
 			return port
 		}
 		port++
 	}
-	
+
 	return preferredPort
 }
 
@@ -119,13 +135,13 @@ func NewServer(port int, collector models.LogCollector) *Server {
 // Start starts the server on the preferred port, or finds the next available port if occupied
 func Start(preferredPort int, collector models.LogCollector) error {
 	actualPort := findAvailablePort(preferredPort)
-	
+
 	if actualPort != preferredPort {
 		fmt.Printf("Port %d is in use, using port %d instead\n", preferredPort, actualPort)
 	}
-	
+
 	fmt.Printf("Starting shepai on http://127.0.0.1:%d\n", actualPort)
-	
+
 	s := NewServer(actualPort, collector)
 
 	// Get initial snapshot
@@ -151,7 +167,7 @@ func Start(preferredPort int, collector models.LogCollector) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/ws", s.handleWebSocket)
 	mux.HandleFunc("/api/snapshot", s.handleSnapshot)
-	
+
 	// Serve static files
 	staticFS, err := fs.Sub(staticFiles, "static")
 	if err != nil {
@@ -206,35 +222,33 @@ func Start(preferredPort int, collector models.LogCollector) error {
 	select {
 	case <-sigChan:
 		log.Println("Shutting down server...")
-		
+
 		// Stop collector
 		if err := collector.Stop(); err != nil {
 			log.Printf("Error stopping collector: %v", err)
 		}
-		
+
 		// Close all WebSocket connections
 		s.mu.Lock()
 		for conn := range s.clients {
 			conn.Close()
 		}
 		s.mu.Unlock()
-		
+
 		// Shutdown HTTP server
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		
+
 		if err := srv.Shutdown(ctx); err != nil {
 			return fmt.Errorf("server shutdown error: %w", err)
 		}
-		
+
 		log.Println("Server stopped")
 		return nil
 	case err := <-serverErr:
 		return fmt.Errorf("server error: %w", err)
 	}
 }
-
-
 
 // handleWebSocket handles WebSocket connections
 func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
@@ -303,10 +317,10 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 // handleSnapshot returns the current snapshot
 func (s *Server) handleSnapshot(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	s.snapshotMu.RLock()
 	defer s.snapshotMu.RUnlock()
-	
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"events": s.snapshot,
 	})
@@ -345,4 +359,3 @@ func (s *Server) removeClient(conn *websocket.Conn) {
 	s.mu.Unlock()
 	conn.Close()
 }
-
