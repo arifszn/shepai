@@ -24,6 +24,15 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 
 ### Quick Install (Recommended)
 
+**macOS & Linux - One-line install:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash
+```
+
+This script automatically detects your platform and installs the latest version.
+
+**Manual installation:**
+
 Download the pre-built binary for your platform from the [latest release](https://github.com/arifszn/shepai/releases/latest):
 
 **macOS (Apple Silicon):**
