@@ -101,31 +101,6 @@ shepai file storage/logs/laravel.log
 shepai docker my_container --port 8080
 ```
 
-## Architecture
-
-High-level flow:
-
-```
-Log Source
-   ↓
-Collector (file/docker)
-   ↓
-Normalizer
-   ↓
-In-memory buffer
-   ↓
-WebSocket broadcaster
-   ↓
-Browser UI
-```
-
-## Security
-
-- Binds only to `127.0.0.1` (localhost only)
-- No authentication required (local use only)
-- No outbound network calls
-- No log shipping or persistence
-
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development setup and guidelines.
