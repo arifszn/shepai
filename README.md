@@ -67,28 +67,7 @@ sudo mv shepai /usr/local/bin/
 shepai --version
 ```
 
-### Build from Source
-
-**Prerequisites:**
-- Go 1.21 or later
-- Node.js 18+ and npm (for building frontend)
-- Docker (optional, for Docker log streaming)
-
-```bash
-# Clone the repository
-git clone https://github.com/arifszn/shepai.git
-cd shepai
-
-# Build everything
-make all
-
-# Or build step by step
-make install    # Install dependencies
-make frontend   # Build frontend
-make build      # Build Go binary
-```
-
-The binary will be created as `./shepai` in the project root.
+Want to build from source? See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
 
 ## Usage
 
