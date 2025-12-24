@@ -59,10 +59,9 @@ func HandleDockerCommand(args []string) {
 
 	fmt.Printf("Streaming logs from container: %s\n", containerIdentifier)
 	fmt.Printf("Press Ctrl+C to stop\n\n")
-	
+
 	if err := server.Start(*port, dockerCollector); err != nil {
 		fmt.Fprintf(os.Stderr, "Error starting server: %v\n", err)
 		os.Exit(1)
 	}
 }
-

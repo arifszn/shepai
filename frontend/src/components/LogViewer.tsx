@@ -4,6 +4,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Badge } from './ui/badge'
 import { Pause, Play, Search, X, Trash2 } from 'lucide-react'
+import Convert from 'ansi-to-html'
 
 interface LogViewerProps {
   source: string
@@ -111,38 +112,40 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     }
   }
 
-  const highlightSearchText = (text: string, query: string): React.ReactNode => {
+  const ansiConverter = useRef(new Convert({
+    fg: '#FFF',
+    bg: '#000',
+    newline: false,
+    escapeXML: true,
+    stream: false
+  }))
+
+  const renderLogMessage = (text: string, query: string): React.ReactNode => {
+    // Convert ANSI codes to HTML
+    const html = ansiConverter.current.toHtml(text)
+    
+    // If there's a search query, we need to highlight matches
+    // But we'll do it after ANSI conversion to preserve colors
     if (!query) {
-      return <span>{text}</span>
+      return <span dangerouslySetInnerHTML={{ __html: html }} />
     }
 
-    const lowerText = text.toLowerCase()
+    // For search highlighting with ANSI, we'll highlight in the HTML
+    const lowerText = text.replace(/\x1b\[[0-9;]*m/g, '').toLowerCase()
     const lowerQuery = query.toLowerCase()
-    const parts: React.ReactNode[] = []
-    let lastIndex = 0
-    let index = lowerText.indexOf(lowerQuery, lastIndex)
-
-    while (index !== -1) {
-      // Add text before match
-      if (index > lastIndex) {
-        parts.push(<span key={`text-${lastIndex}`}>{text.substring(lastIndex, index)}</span>)
-      }
-      // Add highlighted match
-      parts.push(
-        <span key={`match-${index}`} className="bg-yellow-500/30 text-yellow-200 font-semibold">
-          {text.substring(index, index + query.length)}
-        </span>
-      )
-      lastIndex = index + query.length
-      index = lowerText.indexOf(lowerQuery, lastIndex)
+    
+    if (!lowerText.includes(lowerQuery)) {
+      return <span dangerouslySetInnerHTML={{ __html: html }} />
     }
 
-    // Add remaining text
-    if (lastIndex < text.length) {
-      parts.push(<span key={`text-${lastIndex}`}>{text.substring(lastIndex)}</span>)
-    }
-
-    return <>{parts}</>
+    // Simple approach: wrap matches in a highlight span
+    // This is a simplified version - full ANSI-aware highlighting is complex
+    const highlightedHtml = html.replace(
+      new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+      '<span class="bg-yellow-500/30 text-yellow-200 font-semibold">$1</span>'
+    )
+    
+    return <span dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
   }
 
   return (
@@ -228,8 +231,8 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                     {formatTimestamp(log.timestamp)}
                   </span>
                 )}
-                <span className="flex-1 break-words">
-                  {highlightSearchText(log.message, searchQuery)}
+                <span className="flex-1 break-words font-mono">
+                  {renderLogMessage(log.message, searchQuery)}
                 </span>
               </div>
             ))}
