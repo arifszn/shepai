@@ -1,6 +1,6 @@
 # Binaries
-shepai
-shepai.exe
+/shepai
+/shepai.exe
 *.exe
 *.dll
 *.so
