@@ -7,6 +7,10 @@ import (
 	"github.com/monstarlab/shepai/internal/cli"
 )
 
+var (
+	version = "dev"
+)
+
 func main() {
 	if len(os.Args) < 2 {
 		printUsage()
@@ -21,7 +25,7 @@ func main() {
 	case "docker":
 		cli.HandleDockerCommand(os.Args[2:])
 	case "version", "-v", "--version":
-		fmt.Println("shepai v1.0.0")
+		fmt.Printf("shepai %s\n", version)
 		os.Exit(0)
 	case "help", "-h", "--help":
 		printUsage()

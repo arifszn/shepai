@@ -30,7 +30,9 @@ jobs:
       run: cd frontend && npm run build
     
     - name: Build Go binary
-      run: go build -ldflags="-s -w" -o shepai ./cmd/shepai
+      env:
+        VERSION: dev-${{ github.sha }}
+      run: go build -ldflags="-s -w -X main.version=${VERSION}" -o shepai ./cmd/shepai
     
     - name: Verify binary
       run: |
