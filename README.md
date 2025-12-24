@@ -15,10 +15,13 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 - Cross-platform support (macOS, Linux, Windows)
 - Simple, inspectable architecture
 - Real-time log streaming via WebSocket
-- Search and filter capabilities
+- Search and filter capabilities with highlighted results
 - Severity highlighting
+- **ANSI color support** - Preserves colors from Docker container logs
+- **Automatic Docker reconnection** - Automatically reconnects when containers restart
 - Pause/resume functionality
 - Auto-scroll toggle
+- Clear all logs functionality
 
 ## Installation
 
