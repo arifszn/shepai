@@ -32,9 +32,7 @@ jobs:
     - name: Build Go binary
       run: go build -o shepai ./cmd/shepai
     
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: shepai-binary
-        path: shepai
+    - name: Verify binary
+      run: |
+        ./shepai --version || exit 1
 

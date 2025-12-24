@@ -22,13 +22,57 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 
 ## Installation
 
-### Prerequisites
+### Quick Install (Recommended)
 
+Download the pre-built binary for your platform from the [latest release](https://github.com/arifszn/shepai/releases/latest):
+
+**macOS (Apple Silicon):**
+```bash
+curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-darwin-arm64 -o shepai
+chmod +x shepai
+sudo mv shepai /usr/local/bin/
+```
+
+**macOS (Intel):**
+```bash
+curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-darwin-amd64 -o shepai
+chmod +x shepai
+sudo mv shepai /usr/local/bin/
+```
+
+**Linux (AMD64):**
+```bash
+curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-linux-amd64 -o shepai
+chmod +x shepai
+sudo mv shepai /usr/local/bin/
+```
+
+**Linux (ARM64):**
+```bash
+curl -L https://github.com/arifszn/shepai/releases/latest/download/shepai-linux-arm64 -o shepai
+chmod +x shepai
+sudo mv shepai /usr/local/bin/
+```
+
+**Windows:**
+1. Download `shepai.exe` from the [latest release](https://github.com/arifszn/shepai/releases/latest)
+2. Run it directly from the download folder:
+
+```powershell
+.\shepai.exe file storage\logs\laravel.log
+```
+
+**Verify installation:**
+```bash
+shepai --version
+```
+
+### Build from Source
+
+**Prerequisites:**
 - Go 1.21 or later
 - Node.js 18+ and npm (for building frontend)
 - Docker (optional, for Docker log streaming)
-
-### Build from Source
 
 ```bash
 # Clone the repository
