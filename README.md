@@ -1,11 +1,43 @@
-# shepai
+<br/>
 
-**shepai** is a local developer tool that provides a browser-based log viewer for two common log sources:
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/36d6aac0-71d5-45cb-a933-9305f85de90c" width="5%">
+  <h1 align="center">shepai</h1>
+  <h4 align="center">A zero-config log viewer for files and Docker, streamed live in your browser.</h4>
 
-1. **File-based application logs** (e.g. Laravel `storage/logs/*.log`)
-2. **Docker container logs** (via Docker Engine API)
+  <p align="center">
+    <a href="https://github.com/arifszn/shepai/actions/workflows/build.yml">
+      <img src="https://github.com/arifszn/shepai/actions/workflows/build.yml/badge.svg"/>
+    </a>
+    <a href="https://github.com/arifszn/shepai/issues">
+      <img src="https://img.shields.io/github/issues/arifszn/shepai"/>
+    </a>
+    <a href="https://github.com/arifszn/shepai/stargazers">
+      <img src="https://img.shields.io/github/stars/arifszn/shepai"/>
+    </a>
+    <a href="https://github.com/arifszn/shepai/blob/main/CONTRIBUTING.md">
+      <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"/>
+    </a>
+    <a href="https://github.com/arifszn/shepai/blob/main/LICENSE">
+      <img src="https://img.shields.io/github/license/arifszn/shepai"/>
+    </a>
+    <a href="https://twitter.com/intent/tweet?url=https://github.com/arifszn/shepai&hashtags=opensource,devtools,logs,docker,webdev">
+      <img src="https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Farifszn%2Fshepai" />
+    </a>
+  </p>
+</p>
 
-The tool runs locally, streams logs in real time, and exposes a dashboard at `http://localhost:4040`.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/22da3068-0dc3-4260-8eb5-b32978013c64" alt="Preview" width="50%"/>
+  <br/>
+  <img src="https://github.com/user-attachments/assets/1f30303e-87a8-4a2d-baa9-efe84b3222f9" width="40%" alt="Shadow"/>
+</p>
+
+
+**shepai** is a config, real‑time log viewer that streams logs directly to your browser.
+
+It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
+
 
 ## Features
 
@@ -13,37 +45,30 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 - No dependency on application code changes
 - No shelling out to system commands for log streaming
 - Cross-platform support (macOS, Linux, Windows)
-- Simple, inspectable architecture
 - Real-time log streaming via WebSocket
-- Search and filter capabilities with highlighted results
 - Expandable multi-line log details (e.g. stack traces)
 - Severity highlighting
-- ANSI color support - Preserves colors from Docker container logs
+- ANSI color support - Preserves colors from logs
 - Automatic reconnection when containers restart or files are deleted/recreated
-- Pause/resume functionality
-- Auto-scroll toggle
-- Clear all logs functionality
 
-## Installation
+## Getting Started
 
-### macOS & Linux
+### Install
+
+#### macOS & Linux
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash
 ```
 
-### Windows
+#### Windows
 
 1. Download the `shepai-windows-amd64.zip` asset from the [latest release](https://github.com/arifszn/shepai/releases/latest)
-2. Extract it and run the executable
+2. Extract it, open a terminal in the extracted directory
+
+### Verify Installation
 
 ```powershell
-.\shepai.exe file storage\logs\laravel.log
-```
-
-#### Verify installation
-
-```bash
 # macOS/Linux
 shepai --version
 
@@ -51,42 +76,25 @@ shepai --version
 .\shepai.exe --version
 ```
 
-Want to build from source? See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
+### Usage
 
-## Usage
-
-### File Logs
-
-Stream logs from a file:
+#### File Logs
 
 ```bash
 shepai file storage/logs/laravel.log
 ```
 
-**Features:**
-- Automatic file detection - Automatically detects when files are deleted and recreated
-- File rotation support - Handles log rotation (when file size decreases)
-- Status messages appear in the UI when files are deleted or recreated
-
-### Docker Container Logs
-
-Stream logs from a Docker container:
+#### Docker Container Logs
 
 ```bash
 shepai docker my_container
 ```
 
-### Flags
+### Options
 
-- `--port <number>` - Port for web dashboard (default: 4040)
-
-### Examples
+- `--port <number>` — Port for the web dashboard (default: 4040)
 
 ```bash
-# Stream Laravel logs
-shepai file storage/logs/laravel.log
-
-# Stream Docker container logs on custom port
 shepai docker my_container --port 8080
 ```
 
@@ -96,4 +104,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development setup and guidel
 
 ## License
 
-See [LICENSE](LICENSE) file for details.
+[MIT](LICENSE)
