@@ -4,6 +4,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ArrowUp, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle } from 'lucide-react'
 import Convert from 'ansi-to-html'
+import JsonView from '@uiw/react-json-view'
 
 interface LogViewerProps {
   source: string
@@ -116,6 +117,29 @@ const groupLogEventsForDisplay = (events: LogEvent[]): DisplayLogEvent[] => {
   return out
 }
 
+const tryParseJSON = (text: string): any | null => {
+  try {
+    // Trim whitespace
+    const trimmed = text.trim()
+
+    // Must start with { or [ to be JSON
+    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+      return null
+    }
+
+    const parsed = JSON.parse(trimmed)
+
+    // Only return if it's an object or array (not primitives)
+    if (typeof parsed === 'object' && parsed !== null) {
+      return parsed
+    }
+
+    return null
+  } catch {
+    return null
+  }
+}
+
 export default function LogViewer({ source: _source }: LogViewerProps) {
   const [logs, setLogs] = useState<LogEvent[]>([])
   const [isPaused, setIsPaused] = useState(false)
@@ -126,6 +150,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [sourceName, setSourceName] = useState<string>('')
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+  const [jsonViewerEnabled, setJsonViewerEnabled] = useState<Record<string, boolean>>({})
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check for saved preference or default to dark
     if (typeof window !== 'undefined') {
@@ -217,6 +242,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     pausedLogsRef.current = []
     setSearchQuery('')
     setExpanded({})
+    setJsonViewerEnabled({})
   }
 
   const scrollToTop = () => {
@@ -318,10 +344,104 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     })
   }, [isDarkMode])
 
-  const renderLogMessage = (text: string, query: string): React.ReactNode => {
+  const renderLogMessage = (text: string, query: string, severity?: 'error' | 'warning' | 'info' | 'debug' | 'success' | 'default', showJsonViewer?: boolean): React.ReactNode => {
+    // Try to parse as JSON first
+    const jsonData = tryParseJSON(text)
+
+    if (jsonData && showJsonViewer) {
+      // Get severity-based key color
+      const getSeverityKeyColor = () => {
+        if (!severity || severity === 'default') {
+          return isDarkMode ? '#93C5FD' : '#1D4ED8'
+        }
+
+        const colorMap = {
+          error: isDarkMode ? '#F87171' : '#DC2626',
+          warning: isDarkMode ? '#FBBF24' : '#D97706',
+          info: isDarkMode ? '#60A5FA' : '#2563EB',
+          debug: isDarkMode ? '#9CA3AF' : '#6B7280',
+          success: isDarkMode ? '#34D399' : '#059669',
+          default: isDarkMode ? '#93C5FD' : '#1D4ED8',
+        }
+
+        return colorMap[severity]
+      }
+
+      // Render as JSON viewer with theme-aware colors
+      return (
+        <div className="my-1">
+          <JsonView
+            value={jsonData}
+            collapsed={false}
+            displayDataTypes={false}
+            displayObjectSize={false}
+            enableClipboard={false}
+            style={{
+              backgroundColor: 'transparent',
+              fontSize: '11px',
+              fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+              ...(isDarkMode ? {
+                '--w-rjv-color': '#E5E7EB',
+                '--w-rjv-key-string': getSeverityKeyColor(),
+                '--w-rjv-background-color': 'transparent',
+                '--w-rjv-line-color': '#374151',
+                '--w-rjv-arrow-color': 'transparent',
+                '--w-rjv-edit-color': '#60A5FA',
+                '--w-rjv-info-color': '#6B7280',
+                '--w-rjv-update-color': '#34D399',
+                '--w-rjv-copied-color': '#10B981',
+                '--w-rjv-copied-success-color': '#059669',
+                '--w-rjv-curlybraces-color': '#9CA3AF',
+                '--w-rjv-colon-color': '#6B7280',
+                '--w-rjv-brackets-color': '#9CA3AF',
+                '--w-rjv-quotes-color': '#6B7280',
+                '--w-rjv-quotes-string-color': '#E5E7EB',
+                '--w-rjv-type-string-color': '#E5E7EB',
+                '--w-rjv-type-int-color': '#93C5FD',
+                '--w-rjv-type-float-color': '#93C5FD',
+                '--w-rjv-type-bigint-color': '#93C5FD',
+                '--w-rjv-type-boolean-color': '#C4B5FD',
+                '--w-rjv-type-date-color': '#A78BFA',
+                '--w-rjv-type-url-color': '#60A5FA',
+                '--w-rjv-type-null-color': '#9CA3AF',
+                '--w-rjv-type-nan-color': '#9CA3AF',
+                '--w-rjv-type-undefined-color': '#6B7280',
+              } : {
+                '--w-rjv-color': '#1F2937',
+                '--w-rjv-key-string': getSeverityKeyColor(),
+                '--w-rjv-background-color': 'transparent',
+                '--w-rjv-line-color': '#E5E7EB',
+                '--w-rjv-arrow-color': 'transparent',
+                '--w-rjv-edit-color': '#2563EB',
+                '--w-rjv-info-color': '#9CA3AF',
+                '--w-rjv-update-color': '#059669',
+                '--w-rjv-copied-color': '#10B981',
+                '--w-rjv-copied-success-color': '#047857',
+                '--w-rjv-curlybraces-color': '#6B7280',
+                '--w-rjv-colon-color': '#9CA3AF',
+                '--w-rjv-brackets-color': '#6B7280',
+                '--w-rjv-quotes-color': '#9CA3AF',
+                '--w-rjv-quotes-string-color': '#1F2937',
+                '--w-rjv-type-string-color': '#1F2937',
+                '--w-rjv-type-int-color': '#2563EB',
+                '--w-rjv-type-float-color': '#2563EB',
+                '--w-rjv-type-bigint-color': '#2563EB',
+                '--w-rjv-type-boolean-color': '#7C3AED',
+                '--w-rjv-type-date-color': '#7C3AED',
+                '--w-rjv-type-url-color': '#2563EB',
+                '--w-rjv-type-null-color': '#6B7280',
+                '--w-rjv-type-nan-color': '#6B7280',
+                '--w-rjv-type-undefined-color': '#9CA3AF',
+              }),
+            } as any}
+          />
+        </div>
+      )
+    }
+
     // Convert ANSI codes to HTML
     const html = ansiConverter.toHtml(text)
-    
+
     // If there's a search query, we need to highlight matches
     // But we'll do it after ANSI conversion to preserve colors
     if (!query) {
@@ -331,7 +451,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     // For search highlighting with ANSI, we'll highlight in the HTML
     const lowerText = text.replace(/\x1b\[[0-9;]*m/g, '').toLowerCase()
     const lowerQuery = query.toLowerCase()
-    
+
     if (!lowerText.includes(lowerQuery)) {
       return <span className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: html }} />
     }
@@ -342,7 +462,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
       new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
       '<span class="bg-yellow-500/30 text-yellow-900 dark:text-yellow-200 font-semibold">$1</span>'
     )
-    
+
     return <span className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
   }
 
@@ -531,6 +651,9 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 {filteredLogs.map((log) => {
                   const isExpanded = !!expanded[log.key]
                   const hasDetails = log.details.length > 0
+                  const severity = getSeverityLevel(log.header)
+                  const hasJson = !!tryParseJSON(log.header)
+                  const showJsonViewer = jsonViewerEnabled[log.key] !== false // default to true
 
                   return (
                     <div key={log.key} className="hover:bg-muted/40 hover:shadow-sm transition-all duration-150 ease-in-out">
@@ -568,19 +691,33 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                                   <ChevronRight className="w-3 h-3" />
                                 )}
                               </button>
+                            ) : hasJson ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setJsonViewerEnabled((prev) => ({
+                                    ...prev,
+                                    [log.key]: prev[log.key] === false ? true : false,
+                                  }))
+                                }
+                                className="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded border border-border/50 bg-background/60 hover:bg-accent hover:border-border transition-all duration-150 active:scale-95 px-1.5 py-0.5 text-[10px] text-muted-foreground"
+                                title={showJsonViewer ? 'Show raw JSON' : 'Show JSON viewer'}
+                              >
+                                {showJsonViewer ? 'JSON' : 'RAW'}
+                              </button>
                             ) : (
                               <span className="w-6 flex-shrink-0" />
                             )}
 
                             <span className="flex-1 break-words font-mono text-[11px] leading-relaxed">
-                              {renderLogMessage(log.header, searchQuery)}
+                              {renderLogMessage(log.header, searchQuery, severity, showJsonViewer)}
                             </span>
                           </div>
 
                           {hasDetails && isExpanded && (
                             <div className="mt-3 rounded-md border border-border/40 bg-muted/30 dark:bg-muted/20 shadow-inner p-3">
                               <pre className="font-mono text-[10px] leading-relaxed whitespace-pre-wrap break-words text-muted-foreground">
-                                {renderLogMessage(log.details.join('\n'), searchQuery)}
+                                {renderLogMessage(log.details.join('\n'), searchQuery, severity, showJsonViewer)}
                               </pre>
                             </div>
                           )}
