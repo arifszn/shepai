@@ -35,8 +35,6 @@
 
 It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
 
-<img width="50%" alt="image" src="https://github.com/user-attachments/assets/22da3068-0dc3-4260-8eb5-b32978013c64" />
-
 ## Features
 
 - Zero configuration for common dev workflows
@@ -48,6 +46,8 @@ It supports both application log files and Docker container logs, runs entirely 
 - Severity highlighting
 - ANSI color support - Preserves colors from logs
 - Automatic reconnection when containers restart or files are deleted/recreated
+
+<img width="50%" alt="image" src="https://github.com/user-attachments/assets/22da3068-0dc3-4260-8eb5-b32978013c64" />
 
 ## Getting Started
 
