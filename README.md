@@ -28,9 +28,9 @@
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/22da3068-0dc3-4260-8eb5-b32978013c64" alt="Preview" width="60%"/>
+  <img src="https://github.com/user-attachments/assets/22da3068-0dc3-4260-8eb5-b32978013c64" alt="Preview" width="50%"/>
   <br/>
-  <img src="https://github.com/user-attachments/assets/1f30303e-87a8-4a2d-baa9-efe84b3222f9" width="50%" alt="Shadow"/>
+  <img src="https://github.com/user-attachments/assets/1f30303e-87a8-4a2d-baa9-efe84b3222f9" width="40%" alt="Shadow"/>
 </p>
 
 
