@@ -57,20 +57,34 @@ jobs:
         GOARCH: ${{ matrix.goarch }}
         VERSION: ${{ github.ref_name }}
       run: |
-        BINARY_NAME=shepai${{ matrix.ext }}
-        go build -ldflags="-s -w -X main.version=${VERSION}" -o $BINARY_NAME ./cmd/shepai
+        set -euo pipefail
         mkdir -p release
+
         if [ "${{ matrix.goos }}" = "windows" ]; then
-          mv $BINARY_NAME release/shepai.exe
+          BIN_IN_ARCHIVE="shepai.exe"
+          CGO_ENABLED=0 GOOS="${GOOS}" GOARCH="${GOARCH}" \
+            go build -trimpath -ldflags="-s -w -buildid= -X main.version=${VERSION}" -o "${BIN_IN_ARCHIVE}" ./cmd/shepai
+
+          # Compressed release artifacts (smaller download)
+          zip -q "release/shepai-${{ matrix.name }}.zip" "${BIN_IN_ARCHIVE}"
+          tar -czf "release/shepai-${{ matrix.name }}.tar.gz" "${BIN_IN_ARCHIVE}"
         else
-          mv $BINARY_NAME release/shepai-${{ matrix.name }}
+          BIN_IN_ARCHIVE="shepai-${{ matrix.name }}"
+          CGO_ENABLED=0 GOOS="${GOOS}" GOARCH="${GOARCH}" \
+            go build -trimpath -ldflags="-s -w -buildid= -X main.version=${VERSION}" -o "${BIN_IN_ARCHIVE}" ./cmd/shepai
+
+          # Compressed release artifacts (smaller download)
+          zip -q "release/${BIN_IN_ARCHIVE}.zip" "${BIN_IN_ARCHIVE}"
+          tar -czf "release/${BIN_IN_ARCHIVE}.tar.gz" "${BIN_IN_ARCHIVE}"
         fi
     
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: shepai-${{ matrix.name }}
-        path: release/*
+        path: |
+          release/*.tar.gz
+          release/*.zip
         retention-days: 30
   
   create-release:
@@ -90,15 +104,15 @@ jobs:
     - name: Create checksums
       run: |
         cd artifacts
-        find . -type f \( -name 'shepai-*' -o -name 'shepai.exe' \) -exec sha256sum {} \; | sed 's|\./||' > checksums.txt
+        find . -type f \( -name '*.tar.gz' -o -name '*.zip' \) -exec sha256sum {} \; | sed 's|\./||' > checksums.txt
         cat checksums.txt
     
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          artifacts/**/shepai-*
-          artifacts/**/shepai.exe
+          artifacts/**/*.tar.gz
+          artifacts/**/*.zip
           artifacts/checksums.txt
         generate_release_notes: true
       env:
