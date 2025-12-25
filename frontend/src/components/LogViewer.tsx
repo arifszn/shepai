@@ -124,7 +124,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
   const [autoScroll, setAutoScroll] = useState(true)
   const [connected, setConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const [_sourceName, setSourceName] = useState<string>('')
+  const [sourceName, setSourceName] = useState<string>('')
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check for saved preference or default to dark
@@ -334,21 +334,29 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background to-muted/20">
+    <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background/98 to-muted/10">
       {/* Header */}
-      <header className="border-b border-border/50 backdrop-blur-sm bg-background/95 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <header className="border-b border-border/40 bg-background/95 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.3)]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {/* Top Row: Logo and Buttons */}
           <div className="flex items-center justify-between gap-4 mb-3">
             {/* Left: shepai title */}
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-muted-foreground">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-foreground/90 tracking-tight">
                 shepai
               </h1>
+              {sourceName && (
+                <>
+                  <div className="w-px h-5 bg-border/40" />
+                  <span className="text-sm text-muted-foreground font-medium">
+                    {sourceName}
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Right: Compact buttons */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -367,7 +375,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                   </>
                 )}
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
@@ -379,7 +387,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                   Auto-scroll: {autoScroll ? "On" : "Off"}
                 </span>
               </Button>
-              
+
               <Button
                 variant={isPaused ? "default" : "outline"}
                 size="sm"
@@ -398,7 +406,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                   </>
                 )}
               </Button>
-              
+
               <Button
                 variant="destructive"
                 size="sm"
@@ -409,13 +417,13 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 <Trash2 className="w-3.5 h-3.5" />
                 <span className="ml-1.5 hidden sm:inline">Clear All</span>
               </Button>
-              
+
               {/* Dark Mode Toggle */}
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setIsDarkMode(!isDarkMode)}
-                className="h-8 px-2.5 text-xs ml-2"
+                className="h-8 px-2.5 text-xs"
                 title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {isDarkMode ? (
@@ -435,12 +443,12 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
               placeholder="Search logs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10 h-9 text-sm shadow-sm focus:shadow-md transition-shadow"
+              className="pl-10 pr-10 h-9 text-sm shadow-[0_1px_2px_0_rgb(0_0_0_0.05)] dark:shadow-[0_1px_2px_0_rgb(0_0_0_0.2)] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all duration-200"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground hover:scale-110 active:scale-95 transition-all duration-150"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -451,7 +459,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
 
       {/* Connection Status Indicator - Subtle */}
       {!connected && !isLoading && (
-        <div className="bg-destructive/10 border-b border-destructive/20 px-4 py-2">
+        <div className="bg-destructive/5 border-b border-destructive/20 shadow-[inset_0_1px_0_0_rgb(0_0_0_0.05)] px-4 py-2">
           <p className="text-center text-sm text-destructive flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-destructive animate-pulse"></span>
             Connection lost. Attempting to reconnect...
@@ -461,7 +469,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
 
       {/* Loading Indicator */}
       {isLoading && (
-        <div className="bg-blue-500/10 border-b border-blue-500/20 px-4 py-2">
+        <div className="bg-blue-500/5 border-b border-blue-500/20 shadow-[inset_0_1px_0_0_rgb(0_0_0_0.05)] px-4 py-2">
           <p className="text-center text-sm text-blue-600 dark:text-blue-400 flex items-center justify-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
             Connecting to server...
@@ -487,24 +495,24 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
               </p>
             </div>
           ) : (
-            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 shadow-md overflow-hidden">
-              <div className="divide-y divide-border/30">
+            <div className="bg-card/60 backdrop-blur-md rounded-lg border border-border/40 shadow-[0_4px_6px_-1px_rgb(0_0_0_0.06),0_2px_4px_-2px_rgb(0_0_0_0.04)] dark:shadow-[0_4px_6px_-1px_rgb(0_0_0_0.4),0_2px_4px_-2px_rgb(0_0_0_0.3)] ring-1 ring-border/10 overflow-hidden">
+              <div className="divide-y divide-border/20">
                 {filteredLogs.map((log) => {
                   const isExpanded = !!expanded[log.key]
                   const hasDetails = log.details.length > 0
 
                   return (
-                    <div key={log.key} className="hover:bg-muted/30 transition-colors">
+                    <div key={log.key} className="hover:bg-muted/40 hover:shadow-sm transition-all duration-150 ease-in-out">
                       <div
-                        className={`flex gap-3 sm:gap-4 py-2 px-3 sm:px-4 ${getSeverityColor(log.header)}`}
+                        className={`flex gap-3 sm:gap-4 py-3 px-4 ${getSeverityColor(log.header)}`}
                       >
                         {showTimestamps && (
-                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium hidden sm:block">
+                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium tracking-wide hidden sm:block">
                             {formatTimestamp(log.timestamp)}
                           </span>
                         )}
                         {showTimestamps && (
-                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium sm:hidden">
+                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium tracking-wide sm:hidden">
                             {new Date(log.timestamp).toLocaleTimeString()}
                           </span>
                         )}
@@ -520,7 +528,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                                     [log.key]: !prev[log.key],
                                   }))
                                 }
-                                className="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded border border-border/60 bg-background/60 hover:bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground"
+                                className="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded border border-border/50 bg-background/60 hover:bg-accent hover:border-border transition-all duration-150 active:scale-95 px-1.5 py-0.5 text-[10px] text-muted-foreground"
                                 title={isExpanded ? 'Collapse details' : 'Expand details'}
                               >
                                 {isExpanded ? (
@@ -539,7 +547,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                           </div>
 
                           {hasDetails && isExpanded && (
-                            <div className="mt-2 rounded-md border border-border/50 bg-muted/20 p-2">
+                            <div className="mt-3 rounded-md border border-border/40 bg-muted/30 dark:bg-muted/20 shadow-inner p-3">
                               <pre className="font-mono text-[11px] sm:text-xs leading-relaxed whitespace-pre-wrap break-words text-muted-foreground">
                                 {renderLogMessage(log.details.join('\n'), searchQuery)}
                               </pre>
@@ -558,13 +566,13 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 backdrop-blur-sm bg-background/95 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <footer className="border-t border-border/40 bg-background/95 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.3)]">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             {/* Left: Log counts */}
             <div className="flex items-center gap-4 flex-1">
               <span className="flex items-center gap-2">
-                <span className="font-semibold text-foreground">{filteredLogs.length}</span>
+                <span className="font-semibold text-foreground tracking-tight">{filteredLogs.length}</span>
                 {filteredLogs.length === 1 ? 'log' : 'logs'}
               </span>
               {searchQuery && (
@@ -624,7 +632,7 @@ const LogLevelBadges = ({ counts }: LogLevelBadgesProps) => {
     <div className="flex flex-wrap items-center gap-2">
       {badges.map(({ level, icon: Icon, count, color }) => (
         count > 0 && (
-          <div key={level} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${color}`} title={`${count} ${level}`}>
+          <div key={level} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border shadow-sm cursor-default ${color}`} title={`${count} ${level}`}>
             <Icon className="w-3 h-3" />
             <span className="text-[10px] font-semibold">{count}</span>
           </div>
