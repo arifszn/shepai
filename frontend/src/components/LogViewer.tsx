@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { LogEvent, WebSocketMessage } from '../types/log'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle } from 'lucide-react'
+import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ArrowUp, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle } from 'lucide-react'
 import Convert from 'ansi-to-html'
 
 interface LogViewerProps {
@@ -137,6 +137,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
   const wsRef = useRef<WebSocket | null>(null)
   const logsEndRef = useRef<HTMLDivElement>(null)
   const pausedLogsRef = useRef<LogEvent[]>([])
+  const logsContainerRef = useRef<HTMLElement>(null)
 
   // Apply dark mode
   useEffect(() => {
@@ -216,6 +217,18 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     pausedLogsRef.current = []
     setSearchQuery('')
     setExpanded({})
+  }
+
+  const scrollToTop = () => {
+    if (logsContainerRef.current) {
+      logsContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const scrollToBottom = () => {
+    if (logsEndRef.current) {
+      logsEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   const getSeverityLevel = (message: string): 'error' | 'warning' | 'info' | 'debug' | 'success' | 'default' => {
@@ -362,16 +375,17 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 size="sm"
                 onClick={() => setShowTimestamps(!showTimestamps)}
                 className="h-8 px-3 text-xs"
+                title={showTimestamps ? "Hide timestamps" : "Show timestamps"}
               >
                 {showTimestamps ? (
                   <>
                     <EyeOff className="w-3.5 h-3.5" />
-                    <span className="ml-1.5 hidden sm:inline">Hide Timestamps</span>
+                    <span className="ml-1.5 hidden sm:inline">Timestamps</span>
                   </>
                 ) : (
                   <>
                     <Eye className="w-3.5 h-3.5" />
-                    <span className="ml-1.5 hidden sm:inline">Show Timestamps</span>
+                    <span className="ml-1.5 hidden sm:inline">Timestamps</span>
                   </>
                 )}
               </Button>
@@ -382,17 +396,34 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 onClick={() => setAutoScroll(!autoScroll)}
                 className="h-8 px-3 text-xs"
               >
-                <ArrowDown className="w-3.5 h-3.5" />
-                <span className="ml-1.5 hidden md:inline">
-                  Auto-scroll: {autoScroll ? "On" : "Off"}
-                </span>
+                Auto-scroll: {autoScroll ? "On" : "Off"}
               </Button>
 
               <Button
-                variant={isPaused ? "default" : "outline"}
+                variant="outline"
+                size="sm"
+                onClick={scrollToTop}
+                className="h-8 px-2.5 text-xs"
+                title="Scroll to top"
+              >
+                <ArrowUp className="w-3.5 h-3.5" />
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={scrollToBottom}
+                className="h-8 px-2.5 text-xs"
+                title="Scroll to bottom"
+              >
+                <ArrowDown className="w-3.5 h-3.5" />
+              </Button>
+
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handlePause}
-                className="h-8 px-3 text-xs"
+                className={`h-8 px-3 text-xs ${isPaused ? 'bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white' : ''}`}
               >
                 {isPaused ? (
                   <>
@@ -408,11 +439,11 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
               </Button>
 
               <Button
-                variant="destructive"
+                variant="outline"
                 size="sm"
                 onClick={handleClearAll}
                 disabled={logs.length === 0}
-                className="h-8 px-3 text-xs"
+                className="h-8 px-3 text-xs bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span className="ml-1.5 hidden sm:inline">Clear All</span>
@@ -478,7 +509,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
       )}
 
       {/* Logs Container */}
-      <main className="flex-1 overflow-auto">
+      <main ref={logsContainerRef} className="flex-1 overflow-auto">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           {filteredLogs.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
@@ -507,12 +538,12 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                         className={`flex gap-3 sm:gap-4 py-3 px-4 ${getSeverityColor(log.header)}`}
                       >
                         {showTimestamps && (
-                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium tracking-wide hidden sm:block">
+                          <span className="text-gray-500 dark:text-gray-400 text-[10px] flex-shrink-0 pt-0.5 font-medium tracking-wide hidden sm:block">
                             {formatTimestamp(log.timestamp)}
                           </span>
                         )}
                         {showTimestamps && (
-                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium tracking-wide sm:hidden">
+                          <span className="text-gray-500 dark:text-gray-400 text-[10px] flex-shrink-0 pt-0.5 font-medium tracking-wide sm:hidden">
                             {new Date(log.timestamp).toLocaleTimeString()}
                           </span>
                         )}
@@ -541,14 +572,14 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                               <span className="w-6 flex-shrink-0" />
                             )}
 
-                            <span className="flex-1 break-words font-mono text-xs sm:text-sm leading-relaxed">
+                            <span className="flex-1 break-words font-mono text-[11px] leading-relaxed">
                               {renderLogMessage(log.header, searchQuery)}
                             </span>
                           </div>
 
                           {hasDetails && isExpanded && (
                             <div className="mt-3 rounded-md border border-border/40 bg-muted/30 dark:bg-muted/20 shadow-inner p-3">
-                              <pre className="font-mono text-[11px] sm:text-xs leading-relaxed whitespace-pre-wrap break-words text-muted-foreground">
+                              <pre className="font-mono text-[10px] leading-relaxed whitespace-pre-wrap break-words text-muted-foreground">
                                 {renderLogMessage(log.details.join('\n'), searchQuery)}
                               </pre>
                             </div>
@@ -568,7 +599,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
       {/* Footer */}
       <footer className="border-t border-border/40 bg-background/95 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.3)]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
             {/* Left: Log counts */}
             <div className="flex items-center gap-4 flex-1">
               <span className="flex items-center gap-2">
@@ -576,7 +607,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 {filteredLogs.length === 1 ? 'log' : 'logs'}
               </span>
               {searchQuery && (
-                <span className="text-xs">
+                <span className="text-[11px]">
                   (filtered from {displayLogs.length} total)
                 </span>
               )}
@@ -632,9 +663,9 @@ const LogLevelBadges = ({ counts }: LogLevelBadgesProps) => {
     <div className="flex flex-wrap items-center gap-2">
       {badges.map(({ level, icon: Icon, count, color }) => (
         count > 0 && (
-          <div key={level} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border shadow-sm cursor-default ${color}`} title={`${count} ${level}`}>
+          <div key={level} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border shadow-sm cursor-default ${color}`} title={`${count} ${level}`}>
             <Icon className="w-3 h-3" />
-            <span className="text-[10px] font-semibold">{count}</span>
+            <span className="text-[9px] font-semibold">{count}</span>
           </div>
         )
       ))}
