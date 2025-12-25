@@ -17,8 +17,8 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 - Real-time log streaming via WebSocket
 - Search and filter capabilities with highlighted results
 - Severity highlighting
-- **ANSI color support** - Preserves colors from Docker container logs
-- **Automatic Docker reconnection** - Automatically reconnects when containers restart
+- ANSI color support - Preserves colors from Docker container logs
+- Automatic reconnection when containers restart or files are deleted/recreated
 - Pause/resume functionality
 - Auto-scroll toggle
 - Clear all logs functionality
@@ -61,6 +61,11 @@ Stream logs from a file:
 ```bash
 shepai file storage/logs/laravel.log
 ```
+
+**Features:**
+- Automatic file detection - Automatically detects when files are deleted and recreated
+- File rotation support - Handles log rotation (when file size decreases)
+- Status messages appear in the UI when files are deleted or recreated
 
 ### Docker Container Logs
 

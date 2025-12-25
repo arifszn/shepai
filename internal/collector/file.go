@@ -125,6 +125,9 @@ func (f *FileCollector) GetSnapshot() ([]models.LogEvent, error) {
 func (f *FileCollector) Start(ch chan<- models.LogEvent) error {
 	go func() {
 		lastPos := int64(0)
+		reconnectDelay := 2 * time.Second
+		maxReconnectDelay := 30 * time.Second
+		fileWasDeleted := false
 
 		for {
 			select {
@@ -133,18 +136,54 @@ func (f *FileCollector) Start(ch chan<- models.LogEvent) error {
 			default:
 				file, err := os.Open(f.filePath)
 				if err != nil {
-					time.Sleep(1 * time.Second)
+					// File not found - send status message
+					if !fileWasDeleted {
+						ch <- models.LogEvent{
+							Timestamp: time.Now(),
+							Source:    "file",
+							Stream:    "stderr",
+							Message:   fmt.Sprintf("[shepai] File '%s' not found. Waiting for file...", f.filePath),
+						}
+						fileWasDeleted = true
+						lastPos = 0 // Reset position when file is deleted
+					}
+					time.Sleep(reconnectDelay)
+					if reconnectDelay < maxReconnectDelay {
+						reconnectDelay *= 2
+					}
 					continue
+				}
+
+				// File was found (or found again after deletion)
+				if fileWasDeleted {
+					ch <- models.LogEvent{
+						Timestamp: time.Now(),
+						Source:    "file",
+						Stream:    "stdout",
+						Message:   fmt.Sprintf("[shepai] File '%s' found. Resuming log streaming...", f.filePath),
+					}
+					fileWasDeleted = false
+					reconnectDelay = 2 * time.Second // Reset delay
 				}
 
 				stat, err := file.Stat()
 				if err != nil {
 					file.Close()
-					time.Sleep(1 * time.Second)
+					time.Sleep(reconnectDelay)
+					if reconnectDelay < maxReconnectDelay {
+						reconnectDelay *= 2
+					}
 					continue
 				}
 
+				// Check for file rotation (size decreased)
 				if stat.Size() < lastPos {
+					ch <- models.LogEvent{
+						Timestamp: time.Now(),
+						Source:    "file",
+						Stream:    "stdout",
+						Message:   "[shepai] File rotation detected. Restarting from beginning...",
+					}
 					lastPos = 0
 				}
 
