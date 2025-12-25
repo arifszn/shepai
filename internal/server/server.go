@@ -212,7 +212,7 @@ func Start(preferredPort int, collector models.LogCollector) error {
 
 	serverErr := make(chan error, 1)
 	go func() {
-		log.Printf("Server starting on http://%s", addr)
+		log.Printf("shepai starting on http://%s", addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			serverErr <- err
 		}
@@ -240,10 +240,10 @@ func Start(preferredPort int, collector models.LogCollector) error {
 		defer cancel()
 
 		if err := srv.Shutdown(ctx); err != nil {
-			return fmt.Errorf("server shutdown error: %w", err)
+			return fmt.Errorf("shepai shutdown error: %w", err)
 		}
 
-		log.Println("Server stopped")
+		log.Println("shepai stopped")
 		return nil
 	case err := <-serverErr:
 		return fmt.Errorf("server error: %w", err)
