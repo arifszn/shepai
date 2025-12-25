@@ -35,6 +35,23 @@
 
 It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
 
+## Motivation
+
+I built **shepai** because I genuinely dislike debugging logs in the terminal.
+
+Modern application logs are no longer simple strings — they’re often deeply nested JSON, long stack traces, or structured logs that wrap across multiple lines. In a terminal, this quickly becomes painful:
+- JSON is hard to read without collapsing or formatting
+- Stack traces are easy to lose context in
+- Scrolling back and forth breaks flow
+- Filtering specific logs mentally is exhausting
+
+I wanted a way to **see logs the way they deserve to be seen** — structured, searchable, expandable, and persistent on screen — without introducing heavy log infrastructure or changing application code.
+
+**shepai** is the result: a local, zero-config log viewer that turns raw logs into something you can actually reason about.
+
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5" />
+
 ## Features
 
 - Zero configuration for common dev workflows
@@ -48,8 +65,6 @@ It supports both application log files and Docker container logs, runs entirely 
 - No shelling out to system commands for log streaming
 - Cross-platform support (macOS, Linux, Windows)
 
-
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5" />
 
 ## Getting Started
 
