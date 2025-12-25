@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { LogEvent, WebSocketMessage } from '../types/log'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ChevronRight, ChevronDown } from 'lucide-react'
+import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle } from 'lucide-react'
 import Convert from 'ansi-to-html'
 
 interface LogViewerProps {
@@ -16,6 +16,15 @@ type DisplayLogEvent = {
   stream: LogEvent['stream']
   header: string
   details: string[] // continuation lines (e.g. stack frames)
+}
+
+type LogLevelCounts = {
+  error: number
+  warning: number
+  info: number
+  debug: number
+  success: number
+  default: number
 }
 
 const looksLikeNewEntryLine = (line: string): boolean => {
@@ -209,6 +218,26 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     setExpanded({})
   }
 
+  const getSeverityLevel = (message: string): 'error' | 'warning' | 'info' | 'debug' | 'success' | 'default' => {
+    const lower = message.toLowerCase()
+    if (lower.includes('error') || lower.includes('fatal') || lower.includes('exception')) {
+      return 'error'
+    }
+    if (lower.includes('warning') || lower.includes('warn')) {
+      return 'warning'
+    }
+    if (lower.includes('info') || lower.includes('information')) {
+      return 'info'
+    }
+    if (lower.includes('debug')) {
+      return 'debug'
+    }
+    if (lower.includes('success') || lower.includes('ok')) {
+      return 'success'
+    }
+    return 'default'
+  }
+
   const displayLogs = useMemo(() => groupLogEventsForDisplay(logs), [logs])
 
   const filteredLogs = displayLogs.filter((log) => {
@@ -217,6 +246,24 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     const haystack = `${log.header}\n${log.details.join('\n')}`.toLowerCase()
     return haystack.includes(q)
   })
+
+  const levelCounts = useMemo(() => {
+    const counts: LogLevelCounts = {
+      error: 0,
+      warning: 0,
+      info: 0,
+      debug: 0,
+      success: 0,
+      default: 0,
+    }
+
+    for (const log of filteredLogs) {
+      const level = getSeverityLevel(log.header)
+      counts[level]++
+    }
+
+    return counts
+  }, [filteredLogs])
 
   const getSeverityColor = (message: string): string => {
     const lower = message.toLowerCase()
@@ -513,8 +560,9 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
       {/* Footer */}
       <footer className="border-t border-border/50 backdrop-blur-sm bg-background/95 shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            {/* Left: Log counts */}
+            <div className="flex items-center gap-4 flex-1">
               <span className="flex items-center gap-2">
                 <span className="font-semibold text-foreground">{filteredLogs.length}</span>
                 {filteredLogs.length === 1 ? 'log' : 'logs'}
@@ -531,7 +579,14 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
+
+            {/* Center: Log level badges */}
+            <div className="flex items-center justify-center">
+              <LogLevelBadges counts={levelCounts} />
+            </div>
+
+            {/* Right: Connection status */}
+            <div className="flex items-center gap-2 flex-1 justify-end">
               {isLoading ? (
                 <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-500">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
@@ -547,6 +602,33 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
           </div>
         </div>
       </footer>
+    </div>
+  )
+}
+
+interface LogLevelBadgesProps {
+  counts: LogLevelCounts
+}
+
+const LogLevelBadges = ({ counts }: LogLevelBadgesProps) => {
+  const badges = [
+    { level: 'error', icon: XCircle, count: counts.error, color: 'text-red-600/60 dark:text-red-400/50 bg-red-50/40 dark:bg-red-950/10 border-red-200/30 dark:border-red-900/20' },
+    { level: 'warning', icon: AlertTriangle, count: counts.warning, color: 'text-amber-600/60 dark:text-amber-400/50 bg-amber-50/40 dark:bg-amber-950/10 border-amber-200/30 dark:border-amber-900/20' },
+    { level: 'info', icon: Info, count: counts.info, color: 'text-blue-600/60 dark:text-blue-400/50 bg-blue-50/40 dark:bg-blue-950/10 border-blue-200/30 dark:border-blue-900/20' },
+    { level: 'debug', icon: Bug, count: counts.debug, color: 'text-gray-500/60 dark:text-gray-400/50 bg-gray-50/40 dark:bg-gray-950/10 border-gray-200/30 dark:border-gray-900/20' },
+    { level: 'success', icon: CheckCircle, count: counts.success, color: 'text-green-600/60 dark:text-green-400/50 bg-green-50/40 dark:bg-green-950/10 border-green-200/30 dark:border-green-900/20' },
+  ]
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {badges.map(({ level, icon: Icon, count, color }) => (
+        count > 0 && (
+          <div key={level} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${color}`} title={`${count} ${level}`}>
+            <Icon className="w-3 h-3" />
+            <span className="text-[10px] font-semibold">{count}</span>
+          </div>
+        )
+      ))}
     </div>
   )
 }
