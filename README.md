@@ -28,7 +28,7 @@
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/b7dea9ff-db60-4101-aa6f-16ddc34a8d29" alt="Preview" width="50%"/>
+  <img src="https://github.com/user-attachments/assets/d9bdd466-c850-43f2-913b-a99abe932947" alt="Preview" width="50%"/>
 </p>
 
 **shepai** is a zero-config, real‑time log viewer with JSON support that streams logs directly to your browser.
