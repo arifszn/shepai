@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@uiw/react-json-view": "^2.0.0-alpha.39",
     "ansi-to-html": "^0.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
