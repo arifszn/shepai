@@ -64,6 +64,7 @@ func (f *FileCollector) GetSnapshot() ([]models.LogEvent, error) {
 	buf := make([]byte, chunkSize)
 	remaining := DefaultSnapshotLines
 	pos := fileSize
+	hasLeadingPartial := false
 
 	for remaining > 0 && pos > 0 {
 		readSize := chunkSize
@@ -72,6 +73,22 @@ func (f *FileCollector) GetSnapshot() ([]models.LogEvent, error) {
 		}
 
 		pos -= readSize
+
+		// Detect whether this chunk starts in the middle of a line.
+		// If the byte before `pos` is not '\n', then the first "line" parsed from this
+		// chunk will be a partial tail that needs to be merged with the previous chunk.
+		chunkStartsMidLine := false
+		if pos > 0 {
+			if _, err := file.Seek(pos-1, io.SeekStart); err == nil {
+				one := make([]byte, 1)
+				if _, err := file.Read(one); err == nil {
+					if one[0] != '\n' {
+						chunkStartsMidLine = true
+					}
+				}
+			}
+		}
+
 		_, err := file.Seek(pos, io.SeekStart)
 		if err != nil {
 			break
@@ -84,8 +101,17 @@ func (f *FileCollector) GetSnapshot() ([]models.LogEvent, error) {
 
 		// Parse lines from this chunk
 		chunkLines := parseLinesFromChunk(buf[:n])
+
+		// If the previously accumulated slice starts with a partial tail (because the
+		// later chunk began mid-line), merge it into the last line of the current chunk.
+		if hasLeadingPartial && len(lines) > 0 && len(chunkLines) > 0 {
+			chunkLines[len(chunkLines)-1] = chunkLines[len(chunkLines)-1] + lines[0]
+			lines = lines[1:]
+		}
+
 		lines = append(chunkLines, lines...)
 		remaining = DefaultSnapshotLines - len(lines)
+		hasLeadingPartial = chunkStartsMidLine
 
 		if pos == 0 {
 			break

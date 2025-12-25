@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { LogEvent, WebSocketMessage } from '../types/log'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle } from 'lucide-react'
+import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle } from 'lucide-react'
 import Convert from 'ansi-to-html'
 
 interface LogViewerProps {
@@ -617,6 +617,7 @@ const LogLevelBadges = ({ counts }: LogLevelBadgesProps) => {
     { level: 'info', icon: Info, count: counts.info, color: 'text-blue-600/60 dark:text-blue-400/50 bg-blue-50/40 dark:bg-blue-950/10 border-blue-200/30 dark:border-blue-900/20' },
     { level: 'debug', icon: Bug, count: counts.debug, color: 'text-gray-500/60 dark:text-gray-400/50 bg-gray-50/40 dark:bg-gray-950/10 border-gray-200/30 dark:border-gray-900/20' },
     { level: 'success', icon: CheckCircle, count: counts.success, color: 'text-green-600/60 dark:text-green-400/50 bg-green-50/40 dark:bg-green-950/10 border-green-200/30 dark:border-green-900/20' },
+    { level: 'default', icon: Circle, count: counts.default, color: 'text-gray-400/60 dark:text-gray-500/50 bg-gray-50/40 dark:bg-gray-900/10 border-gray-300/30 dark:border-gray-700/20' },
   ]
 
   return (
