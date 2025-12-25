@@ -34,7 +34,7 @@
 </p>
 
 
-**shepai** is a config, real‑time log viewer that streams logs directly to your browser.
+**shepai** is a zero-config, real‑time log viewer that streams logs directly to your browser.
 
 It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
 
