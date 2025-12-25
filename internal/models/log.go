@@ -20,5 +20,8 @@ type LogCollector interface {
 	
 	// GetSnapshot returns a fixed number of recent log lines
 	GetSnapshot() ([]LogEvent, error)
+	
+	// GetSourceName returns the name of the source (file path or container name)
+	GetSourceName() string
 }
 

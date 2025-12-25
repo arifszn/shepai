@@ -32,13 +32,19 @@ func NewDockerCollector(containerIdentifier string) (*DockerCollector, error) {
 	}
 
 	ctx := context.Background()
-	_, err = cli.ContainerInspect(ctx, containerIdentifier)
+	containerInfo, err := cli.ContainerInspect(ctx, containerIdentifier)
 	if err != nil {
 		return nil, fmt.Errorf("container not found (tried: %s). Make sure the container name or ID is correct: %w", containerIdentifier, err)
 	}
 
+	// Use the actual container name (strip leading slash if present)
+	containerName := containerInfo.Name
+	if len(containerName) > 0 && containerName[0] == '/' {
+		containerName = containerName[1:]
+	}
+
 	return &DockerCollector{
-		containerName: containerIdentifier,
+		containerName: containerName,
 		client:        cli,
 		stopChan:      make(chan struct{}),
 	}, nil
@@ -196,6 +202,11 @@ func (d *DockerCollector) streamLogs(reader io.Reader, ch chan<- models.LogEvent
 func (d *DockerCollector) Stop() error {
 	close(d.stopChan)
 	return nil
+}
+
+// GetSourceName returns the container name or ID
+func (d *DockerCollector) GetSourceName() string {
+	return d.containerName
 }
 
 // parseDockerLogs parses Docker log output.

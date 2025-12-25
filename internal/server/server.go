@@ -279,8 +279,9 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	if err := conn.WriteJSON(map[string]interface{}{
-		"type":   "snapshot",
-		"events": snapshotCopy,
+		"type":       "snapshot",
+		"events":     snapshotCopy,
+		"sourceName": s.collector.GetSourceName(),
 	}); err != nil {
 		log.Printf("Error sending snapshot: %v", err)
 		s.removeClient(conn)
@@ -328,11 +329,23 @@ func (s *Server) handleSnapshot(w http.ResponseWriter, r *http.Request) {
 
 // broadcast sends events to all connected clients
 func (s *Server) broadcast() {
+	const maxSnapshotSize = 1000 // Keep last 1000 events in memory for performance
+
 	for event := range s.eventChan {
 		message := map[string]interface{}{
 			"type":  "event",
 			"event": event,
 		}
+
+		// Update snapshot with new event
+		s.snapshotMu.Lock()
+		s.snapshot = append(s.snapshot, event)
+		// Trim snapshot to maxSnapshotSize to prevent unbounded memory growth
+		if len(s.snapshot) > maxSnapshotSize {
+			// Keep only the most recent events
+			s.snapshot = s.snapshot[len(s.snapshot)-maxSnapshotSize:]
+		}
+		s.snapshotMu.Unlock()
 
 		s.mu.RLock()
 		clients := make([]*websocket.Conn, 0, len(s.clients))

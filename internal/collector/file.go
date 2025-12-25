@@ -233,6 +233,11 @@ func (f *FileCollector) Stop() error {
 	return nil
 }
 
+// GetSourceName returns the file path
+func (f *FileCollector) GetSourceName() string {
+	return f.filePath
+}
+
 // parseTimestampFromLine attempts to parse common timestamp formats from log lines
 func (f *FileCollector) parseTimestampFromLine(line string) time.Time {
 	formats := []string{
