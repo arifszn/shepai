@@ -39,6 +39,7 @@ Thumbs.db
 
 # Build artifacts
 *.log
+dist/
 
 # Generated static files (will be created by build)
 internal/server/static/*

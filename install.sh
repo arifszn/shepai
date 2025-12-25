@@ -63,37 +63,83 @@ install() {
     detect_platform
     get_latest_version
     
-    DOWNLOAD_URL="https://github.com/$REPO/releases/download/$VERSION/shepai-$PLATFORM"
+    # Prefer compressed artifacts to reduce download size.
+    # New release assets:
+    # - shepai-$PLATFORM.tar.gz (contains a single file: shepai-$PLATFORM)
+    # - shepai-$PLATFORM.zip
+    # Fallback (older releases):
+    # - shepai-$PLATFORM (raw binary)
+    DOWNLOAD_URL_TGZ="https://github.com/$REPO/releases/download/$VERSION/shepai-$PLATFORM.tar.gz"
+    DOWNLOAD_URL_ZIP="https://github.com/$REPO/releases/download/$VERSION/shepai-$PLATFORM.zip"
+    DOWNLOAD_URL_RAW="https://github.com/$REPO/releases/download/$VERSION/shepai-$PLATFORM"
     
     echo -e "${YELLOW}Downloading shepai $VERSION for $PLATFORM...${NC}"
     
-    # Create temp file
-    TEMP_FILE=$(mktemp)
+    # Create temp workspace
+    TEMP_DIR=$(mktemp -d)
+    TEMP_FILE="$TEMP_DIR/download"
+    EXTRACT_DIR="$TEMP_DIR/extract"
+    mkdir -p "$EXTRACT_DIR"
     
-    # Download
-    if ! curl -fsSL "$DOWNLOAD_URL" -o "$TEMP_FILE"; then
-        echo -e "${RED}Error: Failed to download binary${NC}"
-        rm -f "$TEMP_FILE"
+    cleanup() {
+        rm -rf "$TEMP_DIR"
+    }
+    trap cleanup EXIT
+
+    # Try tar.gz first (best compression), then zip, then raw binary (back-compat)
+    DOWNLOADED_FORMAT=""
+    if curl -fsSL "$DOWNLOAD_URL_TGZ" -o "$TEMP_FILE.tar.gz" 2>/dev/null; then
+        DOWNLOADED_FORMAT="tar.gz"
+    elif curl -fsSL "$DOWNLOAD_URL_ZIP" -o "$TEMP_FILE.zip" 2>/dev/null; then
+        DOWNLOADED_FORMAT="zip"
+    elif curl -fsSL "$DOWNLOAD_URL_RAW" -o "$TEMP_FILE" 2>/dev/null; then
+        DOWNLOADED_FORMAT="raw"
+    else
+        echo -e "${RED}Error: Failed to download release asset${NC}"
+        echo -e "${YELLOW}Tried:${NC}"
+        echo -e "${YELLOW}  - $DOWNLOAD_URL_TGZ${NC}"
+        echo -e "${YELLOW}  - $DOWNLOAD_URL_ZIP${NC}"
+        echo -e "${YELLOW}  - $DOWNLOAD_URL_RAW${NC}"
         exit 1
+    fi
+
+    # Extract/locate binary
+    BIN_PATH=""
+    if [ "$DOWNLOADED_FORMAT" = "tar.gz" ]; then
+        if ! tar -xzf "$TEMP_FILE.tar.gz" -C "$EXTRACT_DIR"; then
+            echo -e "${RED}Error: Failed to extract tar.gz${NC}"
+            exit 1
+        fi
+        BIN_PATH="$EXTRACT_DIR/shepai-$PLATFORM"
+    elif [ "$DOWNLOADED_FORMAT" = "zip" ]; then
+        if ! command -v unzip >/dev/null 2>&1; then
+            echo -e "${RED}Error: 'unzip' is required to install from .zip releases${NC}"
+            exit 1
+        fi
+        if ! unzip -q "$TEMP_FILE.zip" -d "$EXTRACT_DIR"; then
+            echo -e "${RED}Error: Failed to extract zip${NC}"
+            exit 1
+        fi
+        BIN_PATH="$EXTRACT_DIR/shepai-$PLATFORM"
+    else
+        BIN_PATH="$TEMP_FILE"
     fi
     
     # Make executable
-    chmod +x "$TEMP_FILE"
+    chmod +x "$BIN_PATH"
     
     # Verify it's a valid binary
-    if ! file "$TEMP_FILE" | grep -q "executable"; then
+    if ! file "$BIN_PATH" | grep -q "executable"; then
         echo -e "${RED}Error: Downloaded file is not a valid executable${NC}"
-        rm -f "$TEMP_FILE"
         exit 1
     fi
     
     # Install to /usr/local/bin (requires sudo)
     echo -e "${YELLOW}Installing to $INSTALL_DIR (requires sudo)...${NC}"
-    if sudo mv "$TEMP_FILE" "$INSTALL_DIR/$BINARY_NAME"; then
+    if sudo mv "$BIN_PATH" "$INSTALL_DIR/$BINARY_NAME"; then
         echo -e "${GREEN}✓ Successfully installed shepai to $INSTALL_DIR/$BINARY_NAME${NC}"
     else
         echo -e "${RED}Error: Failed to install binary${NC}"
-        rm -f "$TEMP_FILE"
         exit 1
     fi
     

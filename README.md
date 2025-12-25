@@ -34,8 +34,8 @@ curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | ba
 
 ### Windows
 
-1. Download `shepai.exe` from the [latest release](https://github.com/arifszn/shepai/releases/latest)
-2. Run it directly from the download folder
+1. Download the `shepai-windows-amd64.zip` asset from the [latest release](https://github.com/arifszn/shepai/releases/latest)
+2. Extract it and run the executable
 
 ```powershell
 .\shepai.exe file storage\logs\laravel.log
