@@ -9,5 +9,6 @@ export interface WebSocketMessage {
   type: "snapshot" | "event";
   events?: LogEvent[];
   event?: LogEvent;
+  sourceName?: string;
 }
 
