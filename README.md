@@ -16,6 +16,7 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 - Simple, inspectable architecture
 - Real-time log streaming via WebSocket
 - Search and filter capabilities with highlighted results
+- Expandable multi-line log details (e.g. stack traces)
 - Severity highlighting
 - ANSI color support - Preserves colors from Docker container logs
 - Automatic reconnection when containers restart or files are deleted/recreated

@@ -2,11 +2,103 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { LogEvent, WebSocketMessage } from '../types/log'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown } from 'lucide-react'
+import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ChevronRight, ChevronDown } from 'lucide-react'
 import Convert from 'ansi-to-html'
 
 interface LogViewerProps {
   source: string
+}
+
+type DisplayLogEvent = {
+  key: string
+  timestamp: string
+  source: LogEvent['source']
+  stream: LogEvent['stream']
+  header: string
+  details: string[] // continuation lines (e.g. stack frames)
+}
+
+const looksLikeNewEntryLine = (line: string): boolean => {
+  // Common prefixes that strongly indicate a new log entry (not a continuation)
+  // - [2025-12-25 06:12:46] ...
+  // - 2025-12-25 06:12:46 ...
+  // - 2025-12-25T06:12:46Z ...
+  const trimmed = line.trimStart()
+
+  if (trimmed.startsWith('[shepai]')) return true
+
+  const bracketed = /^\[\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?\]/.test(trimmed)
+  if (bracketed) return true
+
+  const plain = /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:[.,]\d+)?/.test(trimmed)
+  if (plain) return true
+
+  const iso = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?/.test(trimmed)
+  if (iso) return true
+
+  return false
+}
+
+const looksLikeContinuationLine = (line: string): boolean => {
+  // Generic heuristics for stack traces / multi-line continuations across ecosystems.
+  // Keep this conservative to avoid accidentally merging unrelated logs.
+  if (!line) return false
+
+  const trimmed = line.trimStart()
+
+  // Indented lines are usually continuations
+  if (/^\s+/.test(line)) return true
+
+  // PHP/Laravel stack frames: "#0 /path:line ..."
+  if (/^#\d+\s+/.test(trimmed)) return true
+
+  // JS stack frames: "at func (file:line:col)"
+  if (/^at\s+\S+/.test(trimmed)) return true
+
+  // Explicit stack-trace markers
+  if (/^\[stacktrace\]\s*$/i.test(trimmed)) return true
+  if (/^stack\s+trace:?/i.test(trimmed)) return true
+  if (/^traceback\s+\(most\s+recent\s+call\s+last\):/i.test(trimmed)) return true
+
+  // Common exception chaining lines
+  if (/^(caused by:|during handling of the above exception)/i.test(trimmed)) return true
+
+  // Go panics often continue with "goroutine ..."
+  if (/^goroutine\s+\d+\s+\[.*\]:/i.test(trimmed)) return true
+  if (/^panic:\s+/i.test(trimmed)) return true
+
+  return false
+}
+
+const groupLogEventsForDisplay = (events: LogEvent[]): DisplayLogEvent[] => {
+  const out: DisplayLogEvent[] = []
+  let counter = 0
+
+  for (const ev of events) {
+    const line = ev.message ?? ''
+    const shouldStartNew =
+      looksLikeNewEntryLine(line) ||
+      out.length === 0 ||
+      !looksLikeContinuationLine(line)
+
+    if (shouldStartNew) {
+      const key = `${ev.timestamp}::${counter++}`
+      out.push({
+        key,
+        timestamp: ev.timestamp,
+        source: ev.source,
+        stream: ev.stream,
+        header: line,
+        details: [],
+      })
+      continue
+    }
+
+    // Append as continuation
+    out[out.length - 1].details.push(line)
+  }
+
+  return out
 }
 
 export default function LogViewer({ source: _source }: LogViewerProps) {
@@ -18,6 +110,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
   const [connected, setConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [_sourceName, setSourceName] = useState<string>('')
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check for saved preference or default to dark
     if (typeof window !== 'undefined') {
@@ -107,11 +200,16 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     setLogs([])
     pausedLogsRef.current = []
     setSearchQuery('')
+    setExpanded({})
   }
 
-  const filteredLogs = logs.filter(log => {
+  const displayLogs = useMemo(() => groupLogEventsForDisplay(logs), [logs])
+
+  const filteredLogs = displayLogs.filter((log) => {
     if (!searchQuery) return true
-    return log.message.toLowerCase().includes(searchQuery.toLowerCase())
+    const q = searchQuery.toLowerCase()
+    const haystack = `${log.header}\n${log.details.join('\n')}`.toLowerCase()
+    return haystack.includes(q)
   })
 
   const getSeverityColor = (message: string): string => {
@@ -161,7 +259,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     // If there's a search query, we need to highlight matches
     // But we'll do it after ANSI conversion to preserve colors
     if (!query) {
-      return <span dangerouslySetInnerHTML={{ __html: html }} />
+      return <span className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: html }} />
     }
 
     // For search highlighting with ANSI, we'll highlight in the HTML
@@ -169,7 +267,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     const lowerQuery = query.toLowerCase()
     
     if (!lowerText.includes(lowerQuery)) {
-      return <span dangerouslySetInnerHTML={{ __html: html }} />
+      return <span className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: html }} />
     }
 
     // Simple approach: wrap matches in a highlight span
@@ -179,7 +277,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
       '<span class="bg-yellow-500/30 text-yellow-900 dark:text-yellow-200 font-semibold">$1</span>'
     )
     
-    return <span dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
+    return <span className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
   }
 
   return (
@@ -338,26 +436,70 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
           ) : (
             <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border/50 shadow-md overflow-hidden">
               <div className="divide-y divide-border/30">
-                {filteredLogs.map((log, index) => (
-                  <div
-                    key={index}
-                    className={`flex gap-3 sm:gap-4 py-2 px-3 sm:px-4 hover:bg-muted/30 transition-colors ${getSeverityColor(log.message)}`}
-                  >
-                    {showTimestamps && (
-                      <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium hidden sm:block">
-                        {formatTimestamp(log.timestamp)}
-                      </span>
-                    )}
-                    {showTimestamps && (
-                      <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium sm:hidden">
-                        {new Date(log.timestamp).toLocaleTimeString()}
-                      </span>
-                    )}
-                    <span className="flex-1 break-words font-mono text-xs sm:text-sm leading-relaxed">
-                      {renderLogMessage(log.message, searchQuery)}
-                    </span>
-                  </div>
-                ))}
+                {filteredLogs.map((log) => {
+                  const isExpanded = !!expanded[log.key]
+                  const hasDetails = log.details.length > 0
+
+                  return (
+                    <div key={log.key} className="hover:bg-muted/30 transition-colors">
+                      <div
+                        className={`flex gap-3 sm:gap-4 py-2 px-3 sm:px-4 ${getSeverityColor(log.header)}`}
+                      >
+                        {showTimestamps && (
+                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium hidden sm:block">
+                            {formatTimestamp(log.timestamp)}
+                          </span>
+                        )}
+                        {showTimestamps && (
+                          <span className="text-gray-500 dark:text-gray-400 text-xs flex-shrink-0 pt-0.5 font-medium sm:hidden">
+                            {new Date(log.timestamp).toLocaleTimeString()}
+                          </span>
+                        )}
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start gap-2">
+                            {hasDetails ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setExpanded((prev) => ({
+                                    ...prev,
+                                    [log.key]: !prev[log.key],
+                                  }))
+                                }
+                                className="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded border border-border/60 bg-background/60 hover:bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground"
+                                title={isExpanded ? 'Collapse details' : 'Expand details'}
+                              >
+                                {isExpanded ? (
+                                  <ChevronDown className="w-3 h-3" />
+                                ) : (
+                                  <ChevronRight className="w-3 h-3" />
+                                )}
+                                <span className="ml-1 hidden sm:inline">
+                                  Details ({log.details.length})
+                                </span>
+                              </button>
+                            ) : (
+                              <span className="w-6 flex-shrink-0" />
+                            )}
+
+                            <span className="flex-1 break-words font-mono text-xs sm:text-sm leading-relaxed">
+                              {renderLogMessage(log.header, searchQuery)}
+                            </span>
+                          </div>
+
+                          {hasDetails && isExpanded && (
+                            <div className="mt-2 rounded-md border border-border/50 bg-muted/20 p-2">
+                              <pre className="font-mono text-[11px] sm:text-xs leading-relaxed whitespace-pre-wrap break-words text-muted-foreground">
+                                {renderLogMessage(log.details.join('\n'), searchQuery)}
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
               <div ref={logsEndRef} />
             </div>
@@ -376,7 +518,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
               </span>
               {searchQuery && (
                 <span className="text-xs">
-                  (filtered from {logs.length} total)
+                  (filtered from {displayLogs.length} total)
                 </span>
               )}
               {isPaused && pausedLogsRef.current.length > 0 && (
