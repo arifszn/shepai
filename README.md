@@ -28,7 +28,7 @@
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f02be2ba-c8ae-4a23-b0e9-99740fed3ac2" alt="Preview" width="50%"/>
+  <img src="https://github.com/user-attachments/assets/b7dea9ff-db60-4101-aa6f-16ddc34a8d29" alt="Preview" width="50%"/>
 </p>
 
 **shepai** is a zero-config, real‑time log viewer that streams logs directly to your browser.
@@ -47,7 +47,7 @@ It supports both application log files and Docker container logs, runs entirely 
 - ANSI color support - Preserves colors from logs
 - Automatic reconnection when containers restart or files are deleted/recreated
 
-<img width="50%" alt="image" src="https://github.com/user-attachments/assets/22da3068-0dc3-4260-8eb5-b32978013c64" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/34983a2f-1110-4c3f-8463-6cd96494ac03" />
 
 ## Getting Started
 
