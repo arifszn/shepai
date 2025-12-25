@@ -7,7 +7,7 @@ frontend:
 
 # Build the Go binary (requires frontend to be built first)
 build: frontend
-	go build -o shepai ./cmd/shepai
+	go build -ldflags="-s -w" -o shepai ./cmd/shepai
 
 # Install dependencies
 install:
