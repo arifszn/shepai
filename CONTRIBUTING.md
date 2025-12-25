@@ -24,33 +24,11 @@ Thank you for your interest in contributing to shepai!
 
 ```
 shepai/
-├── cmd/shepai/          # CLI entry point
-│   └── main.go
-├── internal/
-│   ├── cli/             # Command handlers
-│   │   ├── file.go       # File command handler
-│   │   └── docker.go     # Docker command handler
-│   ├── collector/        # Log collectors
-│   │   ├── file.go       # File log collector
-│   │   └── docker.go      # Docker log collector
-│   ├── models/           # Data models
-│   │   └── log.go        # LogEvent and interfaces
-│   └── server/           # HTTP/WebSocket server
-│       ├── server.go     # Main server logic
-│       └── static/       # Embedded frontend assets (generated)
-├── frontend/             # React frontend
-│   ├── src/
-│   │   ├── components/   # React components
-│   │   │   ├── LogViewer.tsx
-│   │   │   └── ui/       # shadcn/ui components
-│   │   ├── lib/          # Utilities
-│   │   ├── types/        # TypeScript types
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   ├── package.json
-│   └── vite.config.ts
-├── Makefile              # Build automation
-└── go.mod               # Go dependencies
+├── cmd/            # CLI entry point
+├── internal/       # Core backend logic (CLI, collectors, server)
+├── frontend/       # React frontend (log viewer UI)
+├── Makefile        # Build automation
+└── go.mod          # Go dependencies
 ```
 
 ## Development Workflow
@@ -88,42 +66,6 @@ Or step by step:
 make frontend  # Build frontend
 make build     # Build Go binary
 ```
-
-## Key Components
-
-### Backend
-
-1. **CLI (`cmd/shepai/main.go`)**
-   - Parses commands and flags
-   - Routes to appropriate handlers
-
-2. **Collectors (`internal/collector/`)**
-   - `FileCollector`: Reads and follows file logs
-   - `DockerCollector`: Streams Docker container logs via API
-   - Both implement `LogCollector` interface
-
-3. **Server (`internal/server/server.go`)**
-   - HTTP server for frontend
-   - WebSocket server for real-time streaming
-   - Graceful shutdown handling
-   - Static file embedding
-
-4. **Models (`internal/models/log.go`)**
-   - `LogEvent`: Normalized log entry
-   - `LogCollector`: Interface for collectors
-
-### Frontend
-
-1. **LogViewer Component**
-   - Main UI component
-   - WebSocket client
-   - Search, filter, pause/resume
-   - Severity highlighting
-   - Auto-scroll
-
-2. **UI Components**
-   - Button, Input, Badge (shadcn/ui style)
-   - Dark mode by default
 
 ## Build Process
 
@@ -237,14 +179,6 @@ The server automatically increments the port if the preferred port is occupied. 
 ```bash
 ./shepai file log.log --port 8080
 ```
-
-## Security Considerations
-
-- Binds to `127.0.0.1` only (localhost)
-- WebSocket origin checking
-- No authentication (local use only)
-- No external network calls
-- No log persistence
 
 ## Submitting Changes
 

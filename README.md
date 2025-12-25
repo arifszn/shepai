@@ -1,11 +1,8 @@
 # shepai
 
-**shepai** is a local developer tool that provides a browser-based log viewer for two common log sources:
+**shepai** is a config, real‑time log viewer that streams logs directly to your browser.
 
-1. **File-based application logs** (e.g. Laravel `storage/logs/*.log`)
-2. **Docker container logs** (via Docker Engine API)
-
-The tool runs locally, streams logs in real time, and exposes a dashboard at `http://localhost:4040`.
+It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
 
 ## Features
 
@@ -13,37 +10,30 @@ The tool runs locally, streams logs in real time, and exposes a dashboard at `ht
 - No dependency on application code changes
 - No shelling out to system commands for log streaming
 - Cross-platform support (macOS, Linux, Windows)
-- Simple, inspectable architecture
 - Real-time log streaming via WebSocket
-- Search and filter capabilities with highlighted results
 - Expandable multi-line log details (e.g. stack traces)
 - Severity highlighting
-- ANSI color support - Preserves colors from Docker container logs
+- ANSI color support - Preserves colors from logs
 - Automatic reconnection when containers restart or files are deleted/recreated
-- Pause/resume functionality
-- Auto-scroll toggle
-- Clear all logs functionality
 
-## Installation
+## Getting Started
 
-### macOS & Linux
+### Install
+
+#### macOS & Linux
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash
 ```
 
-### Windows
+#### Windows
 
 1. Download the `shepai-windows-amd64.zip` asset from the [latest release](https://github.com/arifszn/shepai/releases/latest)
-2. Extract it and run the executable
+2. Extract it, open a terminal in the extracted directory
+
+### Verify Installation
 
 ```powershell
-.\shepai.exe file storage\logs\laravel.log
-```
-
-#### Verify installation
-
-```bash
 # macOS/Linux
 shepai --version
 
@@ -51,42 +41,25 @@ shepai --version
 .\shepai.exe --version
 ```
 
-Want to build from source? See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed instructions.
+### Usage
 
-## Usage
-
-### File Logs
-
-Stream logs from a file:
+#### File Logs
 
 ```bash
 shepai file storage/logs/laravel.log
 ```
 
-**Features:**
-- Automatic file detection - Automatically detects when files are deleted and recreated
-- File rotation support - Handles log rotation (when file size decreases)
-- Status messages appear in the UI when files are deleted or recreated
-
-### Docker Container Logs
-
-Stream logs from a Docker container:
+#### Docker Container Logs
 
 ```bash
 shepai docker my_container
 ```
 
-### Flags
+### Options
 
-- `--port <number>` - Port for web dashboard (default: 4040)
-
-### Examples
+- `--port <number>` — Port for the web dashboard (default: 4040)
 
 ```bash
-# Stream Laravel logs
-shepai file storage/logs/laravel.log
-
-# Stream Docker container logs on custom port
 shepai docker my_container --port 8080
 ```
 
@@ -96,4 +69,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed development setup and guidel
 
 ## License
 
-See [LICENSE](LICENSE) file for details.
+[MIT](LICENSE)
