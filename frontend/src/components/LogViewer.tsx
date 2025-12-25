@@ -46,6 +46,12 @@ const looksLikeContinuationLine = (line: string): boolean => {
 
   const trimmed = line.trimStart()
 
+  // Standalone closing punctuation lines (often appear as the "closing line" of a multi-line
+  // serialized payload, e.g. JSON that started on a previous line). We treat these as
+  // continuations so they don't show up as their own log entry.
+  // Examples: `}`, `]`, `)`, `"}`, `"]`, `"}"` (optionally with a trailing comma/semicolon)
+  if (/^[\s"'\]\)\}]+[,;]?\s*$/.test(line)) return true
+
   // Indented lines are usually continuations
   if (/^\s+/.test(line)) return true
 
@@ -475,9 +481,6 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                                 ) : (
                                   <ChevronRight className="w-3 h-3" />
                                 )}
-                                <span className="ml-1 hidden sm:inline">
-                                  Details ({log.details.length})
-                                </span>
                               </button>
                             ) : (
                               <span className="w-6 flex-shrink-0" />
