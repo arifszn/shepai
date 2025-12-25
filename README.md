@@ -28,7 +28,7 @@
 </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/d9bdd466-c850-43f2-913b-a99abe932947" alt="Preview" width="50%"/>
+  <img src="https://github.com/user-attachments/assets/b3961d57-edc5-4821-a4d7-c92b93c72775" alt="Preview" width="50%"/>
 </p>
 
 **shepai** is a zero-config, real‑time log viewer with JSON support that streams logs directly to your browser.
@@ -38,18 +38,18 @@ It supports both application log files and Docker container logs, runs entirely 
 ## Features
 
 - Zero configuration for common dev workflows
-- No dependency on application code changes
-- No shelling out to system commands for log streaming
-- Cross-platform support (macOS, Linux, Windows)
-- Real-time log streaming via WebSocket
-- Expandable multi-line log details (e.g. stack traces)
+- Real-time log streaming
 - JSON viewer with syntax highlighting and collapsible structure
-- Toggle between formatted JSON and raw text view
+- Expandable stack traces viewer
 - Severity highlighting with color-coded log levels
 - ANSI color support - Preserves colors from logs
 - Automatic reconnection when containers restart or files are deleted/recreated
+- No dependency on application code changes
+- No shelling out to system commands for log streaming
+- Cross-platform support (macOS, Linux, Windows)
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/34983a2f-1110-4c3f-8463-6cd96494ac03" />
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5" />
 
 ## Getting Started
 
