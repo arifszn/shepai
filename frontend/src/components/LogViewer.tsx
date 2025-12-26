@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { LogEvent, WebSocketMessage } from '../types/log'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ArrowUp, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle } from 'lucide-react'
+import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ArrowUp, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle, Braces } from 'lucide-react'
 import Convert from 'ansi-to-html'
 import JsonView from '@uiw/react-json-view'
 
@@ -151,6 +151,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
   const [sourceName, setSourceName] = useState<string>('')
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [jsonViewerEnabled, setJsonViewerEnabled] = useState<Record<string, boolean>>({})
+  const [jsonViewerGlobalEnabled, setJsonViewerGlobalEnabled] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check for saved preference or default to dark
     if (typeof window !== 'undefined') {
@@ -523,6 +524,20 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => {
+                  setJsonViewerGlobalEnabled(!jsonViewerGlobalEnabled)
+                  setJsonViewerEnabled({})
+                }}
+                className="h-8 px-3 text-xs"
+                title={jsonViewerGlobalEnabled ? "Disable JSON viewer" : "Enable JSON viewer"}
+              >
+                <Braces className="w-3.5 h-3.5" />
+                <span className="ml-1.5 hidden sm:inline">JSON: {jsonViewerGlobalEnabled ? "On" : "Off"}</span>
+              </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={scrollToTop}
                 className="h-8 px-2.5 text-xs"
                 title="Scroll to top"
@@ -654,7 +669,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                   const hasDetails = log.details.length > 0
                   const severity = getSeverityLevel(log.header)
                   const hasJson = !!tryParseJSON(log.header)
-                  const showJsonViewer = jsonViewerEnabled[log.key] !== false // default to true
+                  const showJsonViewer = jsonViewerEnabled[log.key] ?? jsonViewerGlobalEnabled
 
                   return (
                     <div key={log.key} className={`hover:bg-muted/90 dark:hover:bg-muted/90 hover:shadow-sm transition-all duration-150 ease-in-out ${index % 2 === 0 ? 'bg-muted/60 dark:bg-muted/60' : 'bg-transparent'}`}>
@@ -698,7 +713,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                                 onClick={() =>
                                   setJsonViewerEnabled((prev) => ({
                                     ...prev,
-                                    [log.key]: prev[log.key] === false ? true : false,
+                                    [log.key]: !showJsonViewer,
                                   }))
                                 }
                                 className="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded border border-border/50 bg-background/60 hover:bg-accent hover:border-border transition-all duration-150 active:scale-95 px-1.5 py-0.5 text-[10px] text-muted-foreground"
