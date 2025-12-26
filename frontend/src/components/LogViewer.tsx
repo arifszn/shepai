@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState, useMemo } from 'react'
 import { LogEvent, WebSocketMessage } from '../types/log'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ArrowUp, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle, Braces } from 'lucide-react'
+import { getStorageItem } from '../lib/utils'
+import { Pause, Play, Search, X, Trash2, Moon, Sun, Eye, EyeOff, ArrowDown, ArrowUp, ChevronRight, ChevronDown, XCircle, AlertTriangle, Info, Bug, CheckCircle, Circle, Braces, Minus, Plus } from 'lucide-react'
 import Convert from 'ansi-to-html'
 import JsonView from '@uiw/react-json-view'
 
 interface LogViewerProps {
-  source: string
 }
 
 type DisplayLogEvent = {
@@ -149,27 +149,22 @@ const tryParseJSON = (text: string): any | null => {
   }
 }
 
-export default function LogViewer({ source: _source }: LogViewerProps) {
+export default function LogViewer({}: LogViewerProps) {
   const [logs, setLogs] = useState<LogEvent[]>([])
   const [isPaused, setIsPaused] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [showTimestamps, setShowTimestamps] = useState(true)
-  const [autoScroll, setAutoScroll] = useState(true)
+  const [showTimestamps, setShowTimestamps] = useState(() => getStorageItem('logViewer.showTimestamps', true))
+  const [autoScroll, setAutoScroll] = useState(() => getStorageItem('logViewer.autoScroll', true))
   const [connected, setConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [sourceName, setSourceName] = useState<string>('')
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [jsonViewerEnabled, setJsonViewerEnabled] = useState<Record<string, boolean>>({})
-  const [jsonViewerGlobalEnabled, setJsonViewerGlobalEnabled] = useState(false)
+  const [jsonViewerGlobalEnabled, setJsonViewerGlobalEnabled] = useState(() => getStorageItem('logViewer.jsonViewerGlobalEnabled', false))
   const [selectedLevel, setSelectedLevel] = useState<LogLevel | null>(null)
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check for saved preference or default to dark
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('darkMode')
-      return saved !== null ? saved === 'true' : true
-    }
-    return true
-  })
+  const [focusedLogKey, setFocusedLogKey] = useState<string | null>(null)
+  const [zoomLevel, setZoomLevel] = useState(() => getStorageItem('logViewer.zoomLevel', 1)) // Default zoom level (1 = 100%)
+  const [isDarkMode, setIsDarkMode] = useState(() => getStorageItem('darkMode', true))
   const wsRef = useRef<WebSocket | null>(null)
   const logsEndRef = useRef<HTMLDivElement>(null)
   const pausedLogsRef = useRef<LogEvent[]>([])
@@ -184,6 +179,23 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     }
     localStorage.setItem('darkMode', isDarkMode.toString())
   }, [isDarkMode])
+
+  // Persist other view preferences
+  useEffect(() => {
+    localStorage.setItem('logViewer.showTimestamps', showTimestamps.toString())
+  }, [showTimestamps])
+
+  useEffect(() => {
+    localStorage.setItem('logViewer.autoScroll', autoScroll.toString())
+  }, [autoScroll])
+
+  useEffect(() => {
+    localStorage.setItem('logViewer.jsonViewerGlobalEnabled', jsonViewerGlobalEnabled.toString())
+  }, [jsonViewerGlobalEnabled])
+
+  useEffect(() => {
+    localStorage.setItem('logViewer.zoomLevel', zoomLevel.toString())
+  }, [zoomLevel])
 
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -267,6 +279,14 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     if (logsEndRef.current) {
       logsEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
+  }
+
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.1, 1.5)) // Max 150%
+  }
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.1, 0.5)) // Min 50%
   }
 
   const getSeverityLevel = (message: string): LogLevel => {
@@ -494,11 +514,11 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     <div className="flex flex-col h-screen bg-gradient-to-br from-background via-background/98 to-muted/10">
       {/* Header */}
       <header className="border-b border-border/40 bg-background/95 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.3)]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
           {/* Top Row: Logo and Buttons */}
-          <div className="flex items-center justify-between gap-4 mb-3">
+          <div className="flex flex-col xl:flex-row items-center justify-between gap-4 mb-4">
             {/* Left: shepai title */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between w-full xl:w-auto gap-3">
               <h1 className="text-xl font-bold text-foreground/90 tracking-tight">
                 shepai
               </h1>
@@ -513,22 +533,22 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
             </div>
 
             {/* Right: Compact buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 w-full xl:w-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowTimestamps(!showTimestamps)}
-                className="h-8 px-3 text-xs"
+                className="h-7 px-2.5 text-[11px] whitespace-nowrap"
                 title={showTimestamps ? "Hide timestamps" : "Show timestamps"}
               >
                 {showTimestamps ? (
                   <>
-                    <EyeOff className="w-3.5 h-3.5" />
+                    <EyeOff className="w-3 h-3" />
                     <span className="ml-1.5 hidden sm:inline">Timestamps</span>
                   </>
                 ) : (
                   <>
-                    <Eye className="w-3.5 h-3.5" />
+                    <Eye className="w-3 h-3" />
                     <span className="ml-1.5 hidden sm:inline">Timestamps</span>
                   </>
                 )}
@@ -538,7 +558,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setAutoScroll(!autoScroll)}
-                className="h-8 px-3 text-xs"
+                className="h-7 px-2.5 text-[11px] whitespace-nowrap"
               >
                 Auto-scroll: {autoScroll ? "On" : "Off"}
               </Button>
@@ -547,13 +567,13 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  setJsonViewerGlobalEnabled(!jsonViewerGlobalEnabled)
+                  setJsonViewerGlobalEnabled(prev => !prev)
                   setJsonViewerEnabled({})
                 }}
-                className="h-8 px-3 text-xs"
+                className="h-7 px-2.5 text-[11px] whitespace-nowrap"
                 title={jsonViewerGlobalEnabled ? "Disable JSON viewer" : "Enable JSON viewer"}
               >
-                <Braces className="w-3.5 h-3.5" />
+                <Braces className="w-3 h-3" />
                 <span className="ml-1.5 hidden sm:inline">JSON: {jsonViewerGlobalEnabled ? "On" : "Off"}</span>
               </Button>
 
@@ -561,50 +581,68 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 variant="outline"
                 size="sm"
                 onClick={scrollToTop}
-                className="h-8 px-2.5 text-xs"
+                className="h-7 px-2 text-[11px]"
                 title="Scroll to top"
               >
-                <ArrowUp className="w-3.5 h-3.5" />
+                <ArrowUp className="w-3 h-3" />
               </Button>
 
               <Button
                 variant="outline"
                 size="sm"
                 onClick={scrollToBottom}
-                className="h-8 px-2.5 text-xs"
+                className="h-7 px-2 text-[11px]"
                 title="Scroll to bottom"
               >
-                <ArrowDown className="w-3.5 h-3.5" />
+                <ArrowDown className="w-3 h-3" />
               </Button>
 
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handlePause}
-                className={`h-8 px-3 text-xs ${isPaused ? 'bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white' : ''}`}
+                className={`h-7 px-2.5 text-[11px] whitespace-nowrap ${isPaused ? 'bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white' : ''}`}
               >
                 {isPaused ? (
-                  <>
-                    <Play className="w-3.5 h-3.5" />
-                    <span className="ml-1.5 hidden sm:inline">Resume</span>
-                  </>
+                  <Play className="w-3 h-3" />
                 ) : (
-                  <>
-                    <Pause className="w-3.5 h-3.5" />
-                    <span className="ml-1.5 hidden sm:inline">Pause</span>
-                  </>
+                  <Pause className="w-3 h-3" />
                 )}
               </Button>
+
+              {/* Zoom Controls (Moved after Pause) */}
+              <div className="flex items-center rounded-md border border-input bg-background">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleZoomOut}
+                  disabled={zoomLevel <= 0.5}
+                  className="h-7 w-7 rounded-none rounded-l-md p-0 hover:bg-accent"
+                  title="Zoom out"
+                >
+                  <Minus className="w-3 h-3" />
+                </Button>
+                <div className="w-px h-4 bg-border" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleZoomIn}
+                  disabled={zoomLevel >= 1.5}
+                  className="h-7 w-7 rounded-none rounded-r-md p-0 hover:bg-accent"
+                  title="Zoom in"
+                >
+                  <Plus className="w-3 h-3" />
+                </Button>
+              </div>
 
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleClearAll}
                 disabled={logs.length === 0}
-                className="h-8 px-3 text-xs bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-7 px-2.5 text-[11px] whitespace-nowrap bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span className="ml-1.5 hidden sm:inline">Clear All</span>
+                <Trash2 className="w-3 h-3" />
               </Button>
 
               {/* Dark Mode Toggle */}
@@ -612,15 +650,18 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => setIsDarkMode(!isDarkMode)}
-                className="h-8 px-2.5 text-xs"
+                className="h-7 px-2 text-[11px]"
                 title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {isDarkMode ? (
-                  <Sun className="w-3.5 h-3.5" />
+                  <Sun className="w-3 h-3" />
                 ) : (
-                  <Moon className="w-3.5 h-3.5" />
+                  <Moon className="w-3 h-3" />
                 )}
               </Button>
+
+
+
             </div>
           </div>
 
@@ -668,7 +709,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
 
       {/* Logs Container */}
       <main ref={logsContainerRef} className="flex-1 overflow-auto">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-4">
           {filteredLogs.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
@@ -685,26 +726,50 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
             </div>
           ) : (
             <div className="bg-card/60 backdrop-blur-md rounded-lg border border-border/40 shadow-[0_4px_6px_-1px_rgb(0_0_0_0.06),0_2px_4px_-2px_rgb(0_0_0_0.04)] dark:shadow-[0_4px_6px_-1px_rgb(0_0_0_0.4),0_2px_4px_-2px_rgb(0_0_0_0.3)] ring-1 ring-border/10 overflow-hidden">
-              <div className="divide-y divide-border/20">
+              <div className="divide-y divide-border/20" style={{ zoom: zoomLevel }}>
                 {filteredLogs.map((log, index) => {
                   const isExpanded = !!expanded[log.key]
                   const hasDetails = log.details.length > 0
                   const severity = getSeverityLevel(log.header)
                   const hasJson = !!tryParseJSON(log.header)
                   const showJsonViewer = jsonViewerEnabled[log.key] ?? jsonViewerGlobalEnabled
+                  
+                  const isFocused = focusedLogKey === log.key
+                  const isBlurMode = focusedLogKey !== null
+                  const isBlurred = isBlurMode && !isFocused
 
                   return (
-                    <div key={log.key} className={`hover:bg-blue-50/80 dark:hover:bg-blue-950/40 hover:shadow-sm transition-all duration-150 ease-in-out ${index % 2 === 0 ? 'bg-muted/60 dark:bg-muted/60' : 'bg-transparent'}`}>
+                    <div 
+                      key={log.key} 
+                      onClick={() => {
+                        // Don't toggle focus if user is selecting text
+                        if (window.getSelection()?.toString()) return
+                        // If any item is focused, clear focus (unblur all). Otherwise, focus this item.
+                        setFocusedLogKey(prev => prev !== null ? null : log.key)
+                      }}
+                      className={`
+                        transition-all duration-300 ease-in-out cursor-pointer
+                        ${index % 2 === 0 ? 'bg-muted/60 dark:bg-muted/60' : 'bg-transparent'}
+                        ${isBlurred ? 'opacity-30 blur-[1px] grayscale-[0.5]' : ''}
+                        ${isFocused ? 'ring-1 ring-primary/40 shadow-lg scale-[1.01] z-10 rounded-sm !bg-background dark:!bg-background my-1 border-y border-border/50 relative' : 'hover:bg-blue-50/80 dark:hover:bg-blue-950/40 hover:shadow-sm'}
+                      `}
+                    >
                       <div
-                        className={`flex gap-3 sm:gap-4 py-3 px-4 ${getSeverityColor(log.header)}`}
+                        className={`flex gap-2 sm:gap-4 py-2 sm:py-3 px-2 sm:px-4 ${getSeverityColor(log.header)}`}
                       >
                         {showTimestamps && (
-                          <span className="text-gray-500 dark:text-gray-400 text-[10px] flex-shrink-0 pt-0.5 font-medium tracking-wide hidden sm:block">
+                          <span 
+                            className="text-gray-500 dark:text-gray-400 flex-shrink-0 pt-0.5 font-medium tracking-wide hidden sm:block"
+                            style={{ fontSize: '10px' }}
+                          >
                             {formatTimestamp(log.timestamp)}
                           </span>
                         )}
                         {showTimestamps && (
-                          <span className="text-gray-500 dark:text-gray-400 text-[10px] flex-shrink-0 pt-0.5 font-medium tracking-wide sm:hidden">
+                          <span 
+                            className="text-gray-500 dark:text-gray-400 flex-shrink-0 pt-0.5 font-medium tracking-wide sm:hidden"
+                            style={{ fontSize: '10px' }}
+                          >
                             {new Date(log.timestamp).toLocaleTimeString()}
                           </span>
                         )}
@@ -714,12 +779,13 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                             {hasDetails ? (
                               <button
                                 type="button"
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation()
                                   setExpanded((prev) => ({
                                     ...prev,
                                     [log.key]: !prev[log.key],
                                   }))
-                                }
+                                }}
                                 className="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded border border-border/50 bg-background/60 hover:bg-accent hover:border-border transition-all duration-150 active:scale-95 px-1.5 py-0.5 text-[10px] text-muted-foreground"
                                 title={isExpanded ? 'Collapse details' : 'Expand details'}
                               >
@@ -732,12 +798,13 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                             ) : hasJson ? (
                               <button
                                 type="button"
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation()
                                   setJsonViewerEnabled((prev) => ({
                                     ...prev,
                                     [log.key]: !showJsonViewer,
                                   }))
-                                }
+                                }}
                                 className="mt-0.5 flex-shrink-0 inline-flex items-center justify-center rounded border border-border/50 bg-background/60 hover:bg-accent hover:border-border transition-all duration-150 active:scale-95 px-1.5 py-0.5 text-[10px] text-muted-foreground"
                                 title={showJsonViewer ? 'Show raw JSON' : 'Show JSON viewer'}
                               >
@@ -747,14 +814,18 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                               <span className="w-6 flex-shrink-0" />
                             )}
 
-                            <span className="flex-1 break-words font-mono text-[11px] leading-relaxed">
+                            <span 
+                              className="flex-1 break-words font-mono text-[11px] leading-relaxed"
+                            >
                               {renderLogMessage(log.header, searchQuery, severity, showJsonViewer)}
                             </span>
                           </div>
 
                           {hasDetails && isExpanded && (
                             <div className="mt-3 rounded-md border border-border/40 bg-muted/30 dark:bg-muted/20 shadow-inner p-3">
-                              <pre className="font-mono text-[10px] leading-relaxed whitespace-pre-wrap break-words text-muted-foreground">
+                              <pre 
+                                className="font-mono text-[10px] leading-relaxed whitespace-pre-wrap break-words text-muted-foreground"
+                              >
                                 {renderLogMessage(log.details.join('\n'), searchQuery, severity, showJsonViewer)}
                               </pre>
                             </div>
@@ -773,10 +844,10 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
 
       {/* Footer */}
       <footer className="border-t border-border/40 bg-background/95 backdrop-blur-md shadow-[0_1px_3px_0_rgb(0_0_0_0.04)] dark:shadow-[0_1px_3px_0_rgb(0_0_0_0.3)]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
+        <div className="container mx-auto px-2 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col lg:flex-row items-center gap-3 lg:gap-4 text-[11px] text-muted-foreground">
             {/* Left: Log counts */}
-            <div className="flex items-center gap-4 flex-1">
+            <div className="flex items-center justify-center lg:justify-start gap-4 flex-1 w-full lg:w-auto order-2 lg:order-1">
               <span className="flex items-center gap-2">
                 <span className="font-semibold text-foreground tracking-tight">{filteredLogs.length}</span>
                 {filteredLogs.length === 1 ? 'log' : 'logs'}
@@ -795,7 +866,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
             </div>
 
             {/* Center: Log level badges */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center order-1 lg:order-2 w-full lg:w-auto">
               <LogLevelBadges
                 counts={levelCounts}
                 selectedLevel={selectedLevel}
@@ -806,7 +877,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
             </div>
 
             {/* Right: Connection status */}
-            <div className="flex items-center gap-2 flex-1 justify-end">
+            <div className="flex items-center justify-center lg:justify-end gap-2 flex-1 w-full lg:w-auto order-3">
               {isLoading ? (
                 <span className="flex items-center gap-1.5 text-blue-600 dark:text-blue-500">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>

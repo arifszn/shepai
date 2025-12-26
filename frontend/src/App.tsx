@@ -1,20 +1,35 @@
-import { useEffect, useState } from 'react'
+import { useState, useLayoutEffect } from 'react'
 import LogViewer from './components/LogViewer'
+import { Loader2 } from 'lucide-react'
+import { getStorageItem } from './lib/utils'
 
 function App() {
-  const [source, setSource] = useState<string>('')
+  const [initializing, setInitializing] = useState(true)
 
-  useEffect(() => {
-    // Determine source from URL or default to 'file'
-    // In a real implementation, this might come from the server
-    const urlParams = new URLSearchParams(window.location.search)
-    const src = urlParams.get('source') || 'file'
-    setSource(src)
+  useLayoutEffect(() => {
+    // Initialize theme from local storage before rendering to prevent flicker
+    const shouldBeDark = getStorageItem('darkMode', true)
+    
+    if (shouldBeDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    
+    setInitializing(false)
   }, [])
+
+  if (initializing) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="h-screen w-screen">
-      <LogViewer source={source} />
+      <LogViewer />
     </div>
   )
 }
