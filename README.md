@@ -59,6 +59,11 @@ I wanted a way to **see logs the way they deserve to be seen** — structured, s
 - JSON viewer with syntax highlighting and collapsible structure
 - Expandable stack traces viewer
 - Severity highlighting with color-coded log levels
+- Log Severity Filtering - Filter logs by level (Error, Warning, Info, Debug, etc.)
+- Focus Mode - Click a log entry to focus on it while blurring others
+- powerful Search - Real-time text filtering and highlighting
+- Zoom Controls - Adjust text size for better readability
+- Dark/Light Mode - Toggle between themes
 - ANSI color support - Preserves colors from logs
 - Automatic reconnection when containers restart or files are deleted/recreated
 - No dependency on application code changes
