@@ -672,7 +672,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                   const showJsonViewer = jsonViewerEnabled[log.key] ?? jsonViewerGlobalEnabled
 
                   return (
-                    <div key={log.key} className={`hover:bg-muted/90 dark:hover:bg-muted/90 hover:shadow-sm transition-all duration-150 ease-in-out ${index % 2 === 0 ? 'bg-muted/60 dark:bg-muted/60' : 'bg-transparent'}`}>
+                    <div key={log.key} className={`hover:bg-blue-50/80 dark:hover:bg-blue-950/40 hover:shadow-sm transition-all duration-150 ease-in-out ${index % 2 === 0 ? 'bg-muted/60 dark:bg-muted/60' : 'bg-transparent'}`}>
                       <div
                         className={`flex gap-3 sm:gap-4 py-3 px-4 ${getSeverityColor(log.header)}`}
                       >
