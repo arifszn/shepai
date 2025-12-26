@@ -376,6 +376,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
             displayDataTypes={false}
             displayObjectSize={false}
             enableClipboard={false}
+            shortenTextAfterLength={0}
             style={{
               backgroundColor: 'transparent',
               fontSize: '11px',
