@@ -649,7 +649,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
           ) : (
             <div className="bg-card/60 backdrop-blur-md rounded-lg border border-border/40 shadow-[0_4px_6px_-1px_rgb(0_0_0_0.06),0_2px_4px_-2px_rgb(0_0_0_0.04)] dark:shadow-[0_4px_6px_-1px_rgb(0_0_0_0.4),0_2px_4px_-2px_rgb(0_0_0_0.3)] ring-1 ring-border/10 overflow-hidden">
               <div className="divide-y divide-border/20">
-                {filteredLogs.map((log) => {
+                {filteredLogs.map((log, index) => {
                   const isExpanded = !!expanded[log.key]
                   const hasDetails = log.details.length > 0
                   const severity = getSeverityLevel(log.header)
@@ -657,7 +657,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
                   const showJsonViewer = jsonViewerEnabled[log.key] !== false // default to true
 
                   return (
-                    <div key={log.key} className="hover:bg-muted/40 hover:shadow-sm transition-all duration-150 ease-in-out">
+                    <div key={log.key} className={`hover:bg-muted/90 dark:hover:bg-muted/90 hover:shadow-sm transition-all duration-150 ease-in-out ${index % 2 === 0 ? 'bg-muted/60 dark:bg-muted/60' : 'bg-transparent'}`}>
                       <div
                         className={`flex gap-3 sm:gap-4 py-3 px-4 ${getSeverityColor(log.header)}`}
                       >
