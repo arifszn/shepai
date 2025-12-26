@@ -19,13 +19,22 @@ type DisplayLogEvent = {
   details: string[] // continuation lines (e.g. stack frames)
 }
 
+enum LogLevel {
+  ERROR = 'error',
+  WARNING = 'warning',
+  INFO = 'info',
+  DEBUG = 'debug',
+  SUCCESS = 'success',
+  DEFAULT = 'default'
+}
+
 type LogLevelCounts = {
-  error: number
-  warning: number
-  info: number
-  debug: number
-  success: number
-  default: number
+  [LogLevel.ERROR]: number
+  [LogLevel.WARNING]: number
+  [LogLevel.INFO]: number
+  [LogLevel.DEBUG]: number
+  [LogLevel.SUCCESS]: number
+  [LogLevel.DEFAULT]: number
 }
 
 const looksLikeNewEntryLine = (line: string): boolean => {
@@ -152,6 +161,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [jsonViewerEnabled, setJsonViewerEnabled] = useState<Record<string, boolean>>({})
   const [jsonViewerGlobalEnabled, setJsonViewerGlobalEnabled] = useState(false)
+  const [selectedLevel, setSelectedLevel] = useState<LogLevel | null>(null)
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check for saved preference or default to dark
     if (typeof window !== 'undefined') {
@@ -244,6 +254,7 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     setSearchQuery('')
     setExpanded({})
     setJsonViewerEnabled({})
+    setSelectedLevel(null)
   }
 
   const scrollToTop = () => {
@@ -258,52 +269,63 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     }
   }
 
-  const getSeverityLevel = (message: string): 'error' | 'warning' | 'info' | 'debug' | 'success' | 'default' => {
+  const getSeverityLevel = (message: string): LogLevel => {
     const lower = message.toLowerCase()
     if (lower.includes('error') || lower.includes('fatal') || lower.includes('exception')) {
-      return 'error'
+      return LogLevel.ERROR
     }
     if (lower.includes('warning') || lower.includes('warn')) {
-      return 'warning'
+      return LogLevel.WARNING
     }
     if (lower.includes('info') || lower.includes('information')) {
-      return 'info'
+      return LogLevel.INFO
     }
     if (lower.includes('debug')) {
-      return 'debug'
+      return LogLevel.DEBUG
     }
     if (lower.includes('success') || lower.includes('ok')) {
-      return 'success'
+      return LogLevel.SUCCESS
     }
-    return 'default'
+    return LogLevel.DEFAULT
   }
 
   const displayLogs = useMemo(() => groupLogEventsForDisplay(logs), [logs])
 
-  const filteredLogs = displayLogs.filter((log) => {
+  // First apply search filter only (for counting badges)
+  const searchFilteredLogs = useMemo(() => displayLogs.filter((log) => {
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
     const haystack = `${log.header}\n${log.details.join('\n')}`.toLowerCase()
     return haystack.includes(q)
-  })
+  }), [displayLogs, searchQuery])
+
+  // Then apply both search and level filters (for display)
+  const filteredLogs = useMemo(() => searchFilteredLogs.filter((log) => {
+    if (selectedLevel) {
+      const level = getSeverityLevel(log.header)
+      if (level !== selectedLevel) return false
+    }
+    return true
+  }), [searchFilteredLogs, selectedLevel])
 
   const levelCounts = useMemo(() => {
     const counts: LogLevelCounts = {
-      error: 0,
-      warning: 0,
-      info: 0,
-      debug: 0,
-      success: 0,
-      default: 0,
+      [LogLevel.ERROR]: 0,
+      [LogLevel.WARNING]: 0,
+      [LogLevel.INFO]: 0,
+      [LogLevel.DEBUG]: 0,
+      [LogLevel.SUCCESS]: 0,
+      [LogLevel.DEFAULT]: 0,
     }
 
-    for (const log of filteredLogs) {
+    // Count from search-filtered logs to reflect search results
+    for (const log of searchFilteredLogs) {
       const level = getSeverityLevel(log.header)
       counts[level]++
     }
 
     return counts
-  }, [filteredLogs])
+  }, [searchFilteredLogs])
 
   const getSeverityColor = (message: string): string => {
     const lower = message.toLowerCase()
@@ -345,24 +367,24 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
     })
   }, [isDarkMode])
 
-  const renderLogMessage = (text: string, query: string, severity?: 'error' | 'warning' | 'info' | 'debug' | 'success' | 'default', showJsonViewer?: boolean): React.ReactNode => {
+  const renderLogMessage = (text: string, query: string, severity?: LogLevel, showJsonViewer?: boolean): React.ReactNode => {
     // Try to parse as JSON first
     const jsonData = tryParseJSON(text)
 
     if (jsonData && showJsonViewer) {
       // Get severity-based key color
       const getSeverityKeyColor = () => {
-        if (!severity || severity === 'default') {
+        if (!severity || severity === LogLevel.DEFAULT) {
           return isDarkMode ? '#93C5FD' : '#1D4ED8'
         }
 
-        const colorMap = {
-          error: isDarkMode ? '#F87171' : '#DC2626',
-          warning: isDarkMode ? '#FBBF24' : '#D97706',
-          info: isDarkMode ? '#60A5FA' : '#2563EB',
-          debug: isDarkMode ? '#9CA3AF' : '#6B7280',
-          success: isDarkMode ? '#34D399' : '#059669',
-          default: isDarkMode ? '#93C5FD' : '#1D4ED8',
+        const colorMap: Record<LogLevel, string> = {
+          [LogLevel.ERROR]: isDarkMode ? '#F87171' : '#DC2626',
+          [LogLevel.WARNING]: isDarkMode ? '#FBBF24' : '#D97706',
+          [LogLevel.INFO]: isDarkMode ? '#60A5FA' : '#2563EB',
+          [LogLevel.DEBUG]: isDarkMode ? '#9CA3AF' : '#6B7280',
+          [LogLevel.SUCCESS]: isDarkMode ? '#34D399' : '#059669',
+          [LogLevel.DEFAULT]: isDarkMode ? '#93C5FD' : '#1D4ED8',
         }
 
         return colorMap[severity]
@@ -774,7 +796,13 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
 
             {/* Center: Log level badges */}
             <div className="flex items-center justify-center">
-              <LogLevelBadges counts={levelCounts} />
+              <LogLevelBadges
+                counts={levelCounts}
+                selectedLevel={selectedLevel}
+                onLevelClick={(level) => {
+                  setSelectedLevel(selectedLevel === level ? null : level)
+                }}
+              />
             </div>
 
             {/* Right: Connection status */}
@@ -800,26 +828,33 @@ export default function LogViewer({ source: _source }: LogViewerProps) {
 
 interface LogLevelBadgesProps {
   counts: LogLevelCounts
+  selectedLevel: LogLevel | null
+  onLevelClick: (level: LogLevel) => void
 }
 
-const LogLevelBadges = ({ counts }: LogLevelBadgesProps) => {
+const LogLevelBadges = ({ counts, selectedLevel, onLevelClick }: LogLevelBadgesProps) => {
   const badges = [
-    { level: 'error', icon: XCircle, count: counts.error, color: 'text-red-600/90 dark:text-red-400/80 bg-red-50/80 dark:bg-red-950/30 border-red-200/60 dark:border-red-900/40' },
-    { level: 'warning', icon: AlertTriangle, count: counts.warning, color: 'text-amber-600/90 dark:text-amber-400/80 bg-amber-50/80 dark:bg-amber-950/30 border-amber-200/60 dark:border-amber-900/40' },
-    { level: 'info', icon: Info, count: counts.info, color: 'text-blue-600/90 dark:text-blue-400/80 bg-blue-50/80 dark:bg-blue-950/30 border-blue-200/60 dark:border-blue-900/40' },
-    { level: 'debug', icon: Bug, count: counts.debug, color: 'text-gray-500/90 dark:text-gray-400/80 bg-gray-50/80 dark:bg-gray-950/30 border-gray-200/60 dark:border-gray-900/40' },
-    { level: 'success', icon: CheckCircle, count: counts.success, color: 'text-green-600/90 dark:text-green-400/80 bg-green-50/80 dark:bg-green-950/30 border-green-200/60 dark:border-green-900/40' },
-    { level: 'default', icon: Circle, count: counts.default, color: 'text-gray-400/90 dark:text-gray-500/80 bg-gray-50/80 dark:bg-gray-900/30 border-gray-300/60 dark:border-gray-700/40' },
+    { level: LogLevel.ERROR, icon: XCircle, count: counts[LogLevel.ERROR], color: 'text-red-600/90 dark:text-red-400/80 bg-red-50/80 dark:bg-red-950/30 border-red-200/60 dark:border-red-900/40', activeColor: 'text-white dark:text-white bg-red-600 dark:bg-red-600 border-red-700 dark:border-red-700' },
+    { level: LogLevel.WARNING, icon: AlertTriangle, count: counts[LogLevel.WARNING], color: 'text-amber-600/90 dark:text-amber-400/80 bg-amber-50/80 dark:bg-amber-950/30 border-amber-200/60 dark:border-amber-900/40', activeColor: 'text-white dark:text-white bg-amber-600 dark:bg-amber-600 border-amber-700 dark:border-amber-700' },
+    { level: LogLevel.INFO, icon: Info, count: counts[LogLevel.INFO], color: 'text-blue-600/90 dark:text-blue-400/80 bg-blue-50/80 dark:bg-blue-950/30 border-blue-200/60 dark:border-blue-900/40', activeColor: 'text-white dark:text-white bg-blue-600 dark:bg-blue-600 border-blue-700 dark:border-blue-700' },
+    { level: LogLevel.DEBUG, icon: Bug, count: counts[LogLevel.DEBUG], color: 'text-gray-500/90 dark:text-gray-400/80 bg-gray-50/80 dark:bg-gray-950/30 border-gray-200/60 dark:border-gray-900/40', activeColor: 'text-white dark:text-white bg-gray-600 dark:bg-gray-600 border-gray-700 dark:border-gray-700' },
+    { level: LogLevel.SUCCESS, icon: CheckCircle, count: counts[LogLevel.SUCCESS], color: 'text-green-600/90 dark:text-green-400/80 bg-green-50/80 dark:bg-green-950/30 border-green-200/60 dark:border-green-900/40', activeColor: 'text-white dark:text-white bg-green-600 dark:bg-green-600 border-green-700 dark:border-green-700' },
+    { level: LogLevel.DEFAULT, icon: Circle, count: counts[LogLevel.DEFAULT], color: 'text-gray-400/90 dark:text-gray-500/80 bg-gray-50/80 dark:bg-gray-900/30 border-gray-300/60 dark:border-gray-700/40', activeColor: 'text-white dark:text-white bg-gray-600 dark:bg-gray-600 border-gray-700 dark:border-gray-700' },
   ]
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {badges.map(({ level, icon: Icon, count, color }) => (
+      {badges.map(({ level, icon: Icon, count, color, activeColor }) => (
         count > 0 && (
-          <div key={level} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border shadow-sm cursor-default ${color}`} title={`${count} ${level}`}>
+          <button
+            key={level}
+            onClick={() => onLevelClick(level)}
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border shadow-sm transition-all duration-150 hover:scale-105 active:scale-95 cursor-pointer ${selectedLevel === level ? activeColor : color}`}
+            title={`${selectedLevel === level ? 'Clear filter' : 'Filter by'} ${level} (${count})`}
+          >
             <Icon className="w-3 h-3" />
             <span className="text-[9px] font-semibold">{count}</span>
-          </div>
+          </button>
         )
       ))}
     </div>
