@@ -27,13 +27,11 @@
   </p>
 </p>
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/b3961d57-edc5-4821-a4d7-c92b93c72775" alt="Preview" width="50%"/>
-</p>
-
 **shepai (সেপাই)** is a zero-config, real‑time log viewer with JSON support that streams logs directly to your browser.
 
 It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
+
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5" />
 
 ## Motivation
 
@@ -44,9 +42,6 @@ Modern application logs are no longer simple strings — they’re often deeply 
 I wanted a way to **see logs the way they deserve to be seen** — structured, searchable, expandable, and persistent on screen — without introducing heavy log infrastructure or changing application code.
 
 **shepai** is the result: a local, zero-config log viewer that turns raw logs into something you can actually reason about.
-
-
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5" />
 
 ## Features
 
