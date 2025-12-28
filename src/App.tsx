@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Terminal } from "@/components/Terminal"
+
+import { HeroAnimation } from "@/components/HeroAnimation"
 import {
   Download,
   Play,
@@ -33,7 +34,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-b from-background via-primary/5 to-background antialiased">
       {/* Header */}
       <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -70,7 +71,9 @@ function App() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 md:py-32">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+          <h1
+            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 text-primary p-2"
+          >
             shepai
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8">
@@ -80,9 +83,8 @@ function App() {
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
             <a href="#install">
               <Button size="lg" className="text-base">
-                <Download className="w-5 h-5 mr-2" />
+                <Play className="w-5 h-5 mr-2 fill-current" />
                 Get Started
-                <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </a>
             <a href="https://github.com/arifszn/shepai" target="_blank" rel="noopener noreferrer">
@@ -93,18 +95,9 @@ function App() {
             </a>
           </div>
 
-          {/* Animated Terminal */}
-          <Terminal />
-
-          {/* Demo Screenshot */}
-          <div className="mt-16 w-full max-w-5xl mx-auto">
-            <div className="relative rounded-xl overflow-hidden shadow-2xl border border-border/50">
-              <img
-                src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5"
-                alt="shepai dashboard demo"
-                className="w-full h-auto"
-              />
-            </div>
+          {/* Animated Hero Section */}
+          <div className="mt-2 w-full">
+            <HeroAnimation screenshotUrl="/demo.png" />
           </div>
         </div>
       </section>

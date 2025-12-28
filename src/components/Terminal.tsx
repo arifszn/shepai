@@ -4,9 +4,10 @@ import { cn } from "@/lib/utils"
 
 interface TerminalProps {
   className?: string
+  onComplete?: () => void
 }
 
-export function Terminal({ className }: TerminalProps) {
+export function Terminal({ className, onComplete }: TerminalProps) {
   const typedRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
@@ -17,17 +18,22 @@ export function Terminal({ className }: TerminalProps) {
       typeSpeed: 50,
       backSpeed: 30,
       smartBackspace: true,
-      loop: true,
-      fadeOut: true,
-      fadeOutDelay: 500,
+      loop: false,
       showCursor: true,
       cursorChar: "|",
+      onComplete: (self) => {
+        // Remove cursor after typing is done
+        self.cursor.remove()
+        if (onComplete) {
+          setTimeout(onComplete, 1000) // Small delay before triggering completion
+        }
+      },
     })
 
     return () => {
       typed.destroy()
     }
-  }, [])
+  }, [onComplete])
 
   return (
     <div
