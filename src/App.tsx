@@ -3,23 +3,34 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 import { HeroAnimation } from "@/components/HeroAnimation"
+import { LazyVideo } from "@/components/LazyVideo"
 import {
   Play,
   FileText,
   Container,
-  Search,
-  Eye,
-  Palette,
-  Zap,
-  Code2,
   Github,
-  Twitter,
   Heart,
-  Check,
-  ChevronRight,
   Copy,
   Check as CheckCopy,
-  Terminal
+  Terminal,
+  Settings,
+  Zap,
+  Activity,
+  Braces,
+  ListTree,
+  Search,
+  Maximize2,
+  Palette,
+  Monitor,
+  RefreshCw,
+  Moon,
+  ZoomIn,
+  Bug,
+  Tags,
+  Eye,
+  Code2,
+  Check,
+  Filter
 } from "lucide-react"
 import logoSvg from "/logo.svg"
 
@@ -110,7 +121,7 @@ function App() {
       <section id="install" className="container mx-auto px-4 py-20">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Installation</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Install</h2>
             <p className="text-muted-foreground text-lg">
               Choose your platform and get started in seconds
             </p>
@@ -215,7 +226,10 @@ function App() {
                     <div className="bg-muted/50 rounded-lg p-4 border text-sm">
                       <p className="font-medium mb-2">Verify the installation (restart your terminal first):</p>
                       <div className="relative group">
-                        <code className="font-mono block bg-background px-3 py-2 rounded border">shepai --version</code>
+                        <div className="font-mono block bg-background px-3 py-2 rounded border">
+                          <span className="text-green-600">shepai</span>{" "}
+                          <span className="text-purple-600">--version</span>
+                        </div>
                         <button
                           onClick={() => copyToClipboard("shepai --version")}
                           className="absolute right-2 top-2 p-1.5 rounded-md hover:bg-muted transition-colors"
@@ -263,7 +277,10 @@ function App() {
                     <div className="bg-muted/50 rounded-lg p-4 border text-sm mb-4">
                       <p className="font-medium mb-2">Verify the installation:</p>
                       <div className="relative group">
-                        <code className="font-mono block bg-background px-3 py-2 rounded border">.\shepai.exe --version</code>
+                        <div className="font-mono block bg-background px-3 py-2 rounded border">
+                          <span className="text-green-600">.\shepai.exe</span>{" "}
+                          <span className="text-purple-600">--version</span>
+                        </div>
                         <button
                           onClick={() => copyToClipboard(".\\shepai.exe --version")}
                           className="absolute right-2 top-2 p-1.5 rounded-md hover:bg-muted transition-colors"
@@ -298,7 +315,8 @@ function App() {
               <CardContent>
                 <div className="relative group">
                   <div className="bg-muted p-4 rounded-lg font-mono text-sm pr-12">
-                    <code>shepai --version</code>
+                    <span className="text-green-600">shepai</span>{" "}
+                    <span className="text-purple-600">--version</span>
                   </div>
                   <button
                     onClick={() => copyToClipboard("shepai --version")}
@@ -319,122 +337,143 @@ function App() {
       </section>
 
       {/* Usage Section */}
-      <section id="usage" className="container mx-auto px-4 py-20 bg-muted/30">
-        <div className="max-w-4xl mx-auto">
+      <section id="usage" className="container mx-auto px-4 py-24 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Usage</h2>
             <p className="text-muted-foreground text-lg">
-              View logs from files or Docker containers with a single command
+              Start viewing logs in your browser instantly. No configuration files, no complicated setup.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* File Logs */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Watch File Logs */}
+            <Card className="border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <FileText className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
+                  <FileText className="w-6 h-6 text-blue-600" />
                 </div>
-                <CardTitle>File Logs</CardTitle>
-                <CardDescription>
-                  Stream any log file directly to your browser
+                <CardTitle className="text-2xl">Watch File Logs</CardTitle>
+                <CardDescription className="text-base">
+                  Stream any log file directly to your browser with real-time updates.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="relative group mb-4">
-                  <div className="bg-muted p-4 rounded-lg font-mono text-sm pr-12">
-                    <code className="text-green-600">shepai file</code>{" "}
-                    <code className="text-blue-600">storage/logs/app.log</code>
+                <div className="rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/10 shadow-2xl">
+                  <div className="flex items-center gap-1.5 px-4 py-3 bg-white/5 border-b border-white/5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
                   </div>
-                  <button
-                    onClick={() => copyToClipboard("shepai file storage/logs/app.log")}
-                    className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
-                    title="Copy to clipboard"
-                  >
-                    {copiedCommand === "shepai file storage/logs/app.log" ? (
-                      <CheckCopy className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </button>
+                  <div className="p-4 relative group">
+                    <div className="font-mono text-sm text-gray-300 overflow-x-auto pr-8">
+                      <span className="text-green-400">shepai</span>{" "}
+                      <span className="text-blue-400">file</span>{" "}
+                      <span className="text-gray-400">/path/to/app.log</span>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard("shepai file /path/to/app.log")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Copy to clipboard"
+                    >
+                      {copiedCommand === "shepai file /path/to/app.log" ? (
+                        <CheckCopy className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-                <div className="bg-primary/5 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-semibold text-primary">Dashboard:</span>{" "}
-                    http://localhost:4040
-                  </p>
-                </div>
+
               </CardContent>
             </Card>
 
-            {/* Docker Logs */}
-            <Card className="border-2 hover:border-primary/50 transition-colors">
+            {/* Watch Docker Logs */}
+            <Card className="border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                  <Container className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
+                  <Container className="w-6 h-6 text-orange-600" />
                 </div>
-                <CardTitle>Docker Logs</CardTitle>
-                <CardDescription>
-                  Monitor Docker container logs in real-time
+                <CardTitle className="text-2xl">Watch Docker Logs</CardTitle>
+                <CardDescription className="text-base">
+                  Monitor any running Docker container without leaving your browser.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="relative group mb-4">
-                  <div className="bg-muted p-4 rounded-lg font-mono text-sm pr-12">
-                    <code className="text-green-600">shepai docker</code>{" "}
-                    <code className="text-blue-600">my_container</code>
+                <div className="rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/10 shadow-2xl">
+                  <div className="flex items-center gap-1.5 px-4 py-3 bg-white/5 border-b border-white/5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
                   </div>
-                  <button
-                    onClick={() => copyToClipboard("shepai docker my_container")}
-                    className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
-                    title="Copy to clipboard"
-                  >
-                    {copiedCommand === "shepai docker my_container" ? (
-                      <CheckCopy className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </button>
+                  <div className="p-4 relative group">
+                    <div className="font-mono text-sm text-gray-300 overflow-x-auto pr-8">
+                      <span className="text-green-400">shepai</span>{" "}
+                      <span className="text-blue-400">docker</span>{" "}
+                      <span className="text-orange-400">container-name</span>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard("shepai docker container-name")}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Copy to clipboard"
+                    >
+                      {copiedCommand === "shepai docker container-name" ? (
+                        <CheckCopy className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
                 </div>
-                <div className="bg-primary/5 p-3 rounded-lg">
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-semibold text-primary">Dashboard:</span>{" "}
-                    http://localhost:4040
-                  </p>
-                </div>
+
               </CardContent>
             </Card>
           </div>
 
-          {/* Port Option */}
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle className="text-lg">Custom Port</CardTitle>
-              <CardDescription>
-                Use the --port flag to specify a different port for the dashboard
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="relative group">
-                <div className="bg-muted p-4 rounded-lg font-mono text-sm pr-12">
-                  <code className="text-green-600">shepai docker</code>{" "}
-                  <code className="text-blue-600">app</code>{" "}
-                  <code className="text-orange-600">--port 8080</code>
+          {/* Options */}
+          <div className="mt-8">
+            <Card className="border-border/50 bg-background/50 backdrop-blur-sm">
+              <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-gray-500" />
+                    Options
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    Need to run on a specific port? Use the <code className="text-xs bg-muted px-1 py-0.5 rounded">--port</code> flag to customize where the dashboard is served.
+                  </p>
                 </div>
-                <button
-                  onClick={() => copyToClipboard("shepai docker app --port 8080")}
-                  className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
-                  title="Copy to clipboard"
-                >
-                  {copiedCommand === "shepai docker app --port 8080" ? (
-                    <CheckCopy className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </button>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="w-full md:w-auto md:min-w-[300px]">
+                  <div className="rounded-xl overflow-hidden bg-[#1e1e1e] border border-white/10 shadow-2xl">
+                    <div className="flex items-center gap-1.5 px-4 py-3 bg-white/5 border-b border-white/5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E]" />
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F]" />
+                    </div>
+                    <div className="p-4 relative group">
+                      <div className="font-mono text-sm text-gray-300 overflow-x-auto pr-8">
+                        <span className="text-green-400">shepai</span>{" "}
+                        <span className="text-blue-400">docker</span>{" "}
+                        <span className="text-orange-400">container-name</span>{" "}
+                        <span className="text-yellow-400">--port 8080</span>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard("shepai docker container-name --port 8080")}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-white/10 transition-colors opacity-0 group-hover:opacity-100"
+                        title="Copy to clipboard"
+                      >
+                        {copiedCommand === "shepai docker container-name --port 8080" ? (
+                          <CheckCopy className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
@@ -442,7 +481,7 @@ function App() {
       <section id="uninstall" className="container mx-auto px-4 py-20 bg-muted/30">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Uninstallation</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Uninstall</h2>
             <p className="text-muted-foreground text-lg">
               Choose your platform to remove shepai
             </p>
@@ -522,6 +561,7 @@ function App() {
       </section>
 
       {/* Features Section */}
+      {/* Features Section */}
       <section id="features" className="container mx-auto px-4 py-20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -554,14 +594,14 @@ function App() {
                 description: "Real-time text filtering and highlighting across all logs."
               },
               {
-                icon: Palette,
-                title: "Dark/Light Mode",
-                description: "Toggle between themes for comfortable viewing in any environment."
+                icon: ListTree,
+                title: "Stack Traces",
+                description: "Expandable stack traces that make debugging complex errors a breeze."
               },
               {
-                icon: Container,
-                title: "Docker Support",
-                description: "Monitor container logs without shelling out to docker commands."
+                icon: Filter,
+                title: "Log Severity Filtering",
+                description: "Filter logs by severity levels (Error, Warning, Info, Debug) to focus on what matters."
               }
             ].map((feature, index) => (
               <Card key={index} className="border-none shadow-sm bg-muted/30">
@@ -584,15 +624,14 @@ function App() {
             <CardContent>
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
-                  "Expandable stack traces viewer",
+                  "Dark/Light Mode support",
                   "Severity highlighting with color-coded levels",
-                  "Log severity filtering (Error, Warning, Info, Debug)",
                   "Focus mode for individual log entries",
                   "Zoom controls for text size adjustment",
                   "ANSI color support from logs",
                   "Automatic reconnection on restart",
-                  "No application code changes needed",
-                  "Cross-platform support (macOS, Linux, Windows)"
+                  "Cross-platform support (macOS, Linux, Windows)",
+                  "No shelling out to system commands for log streaming"
                 ].map((item, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
@@ -605,67 +644,69 @@ function App() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Preview Section */}
       <section className="container mx-auto px-4 py-20">
-        <div className="max-w-3xl mx-auto text-center">
-          <Card className="border-primary/20 bg-primary/5">
-            <CardHeader className="pb-4">
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">
-                Ready to streamline your log viewing?
-              </h2>
-              <p className="text-muted-foreground">
-                Install shepai and start viewing logs in your browser today.
-              </p>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#install">
-                  <Button size="lg" className="text-base">
-                    <Play className="w-5 h-5 mr-2" />
-                    Get Started Now
-                  </Button>
-                </a>
-                <a href="https://github.com/arifszn/shepai" target="_blank" rel="noopener noreferrer">
-                  <Button size="lg" variant="outline" className="text-base">
-                    <Github className="w-5 h-5 mr-2" />
-                    Star on GitHub
-                  </Button>
-                </a>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              See it in action
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Transform your logs into a powerful web interface instantly.
+            </p>
+          </div>
+          <LazyVideo src="/preview.mp4" />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-muted/30">
-        <div className="container mx-auto px-4 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="border-t bg-muted/20">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <div className="md:col-span-2 space-y-4">
+              <div className="flex items-center gap-2">
+                <img src={logoSvg} alt="shepai logo" className="w-8 h-8" />
+                <span className="font-bold text-xl">shepai</span>
+              </div>
+              <p className="text-muted-foreground max-w-sm">
+                Stream logs directly to your browser with JSON support, syntax highlighting, and real-time updates.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold mb-4">Explore</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><a href="#install" className="hover:text-primary transition-colors">Install</a></li>
+                <li><a href="#usage" className="hover:text-primary transition-colors">Usage</a></li>
+                <li><a href="#features" className="hover:text-primary transition-colors">Features</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-4">Resources</h3>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li>
+                  <a href="https://github.com/arifszn/shepai" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors inline-flex items-center gap-2">
+                    <Github className="w-4 h-4" /> GitHub
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/arifszn/shepai/issues" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors inline-flex items-center gap-2">
+                    <Bug className="w-4 h-4" /> Issues
+                  </a>
+                </li>
+                <li>
+                  <a href="https://github.com/arifszn/shepai/releases" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors inline-flex items-center gap-2">
+                    <Tags className="w-4 h-4" /> Releases
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+            <p>© {new Date().getFullYear()}. MIT License.</p>
             <div className="flex items-center gap-2">
-              <img src={logoSvg} alt="shepai logo" className="w-6 h-6" />
-              <span className="font-semibold">shepai</span>
-            </div>
-
-            <div className="flex items-center gap-6">
-              <a
-                href="https://github.com/arifszn/shepai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-              <a
-                href="https://twitter.com/intent/tweet?url=https://github.com/arifszn/shepai&hashtags=opensource,devtools,logs,docker,webdev"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Made with</span>
               <Heart className="w-4 h-4 text-red-500 fill-red-500" />
               <span>by</span>
@@ -673,17 +714,11 @@ function App() {
                 href="https://github.com/arifszn"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-primary transition-colors"
+                className="font-medium hover:text-primary transition-colors"
               >
                 arifszn
               </a>
             </div>
-          </div>
-
-          <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-            <p>
-              MIT License — Open source, freely usable for any purpose
-            </p>
           </div>
         </div>
       </footer>
