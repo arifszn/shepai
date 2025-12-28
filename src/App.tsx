@@ -646,7 +646,7 @@ function App() {
               See it in action
             </h2>
             <p className="text-muted-foreground text-lg">
-              Transform your logs into a powerful web interface instantly.
+              Transform your logs into a powerful web interface instantly
             </p>
           </div>
           <LazyVideo src="./preview.mp4" />
