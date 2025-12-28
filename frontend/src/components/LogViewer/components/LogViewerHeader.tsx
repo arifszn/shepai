@@ -174,7 +174,7 @@ export const LogViewerHeader = ({
               size="sm"
               onClick={onClearAll}
               disabled={!canClear}
-              className="h-7 px-2.5 text-[11px] whitespace-nowrap bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-7 px-2.5 text-[11px] whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Trash2 className="w-3 h-3" />
             </Button>
@@ -184,7 +184,7 @@ export const LogViewerHeader = ({
               variant="outline"
               size="sm"
               onClick={onToggleDarkMode}
-              className="h-7 px-2 text-[11px]"
+              className="h-7 px-2 text-[11px] bg-black dark:bg-white text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90 hover:text-white dark:hover:text-black border-black dark:border-white"
               title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             >
               {isDarkMode ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}

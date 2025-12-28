@@ -31,7 +31,7 @@
 
 It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/559ea7b4-6eda-41d2-8297-d7df18463eda" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/f2a24c49-acb4-4ac5-9cc3-050ceaa51f06" />
 
 ## Motivation
 
@@ -61,32 +61,61 @@ I wanted a way to **see logs the way they deserve to be seen** — structured, s
 - No shelling out to system commands for log streaming
 - Cross-platform support (macOS, Linux, Windows)
 
-https://github.com/user-attachments/assets/1af31674-f326-48a8-934c-2f472a49370b
+https://github.com/user-attachments/assets/9118aa6b-5d5c-41bc-80e4-ae1b064e09a2
 
 ## Getting Started
 
-### Install
+### Installation
+
+Choose the installation method for your operating system:
 
 #### macOS & Linux
+
+Run the automated installation script:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash
 ```
 
+**Verify the installation:**
+
+```bash
+shepai --version
+```
+
+---
+
 #### Windows
 
-1. Download the `shepai-windows-amd64.zip` asset from the [latest release](https://github.com/arifszn/shepai/releases/latest)
-2. Extract it, open a terminal in the extracted directory
+##### Option 1: PowerShell Script (Recommended)
 
-### Verify Installation
+Run the automated installation script in PowerShell:
 
 ```powershell
-# macOS/Linux
-shepai --version
+irm https://raw.githubusercontent.com/arifszn/shepai/main/install.ps1 | iex
+```
 
-# Windows
+**Verify the installation** (restart your terminal first):
+
+```powershell
+shepai --version
+```
+
+##### Option 2: Manual Installation
+
+If you prefer to install manually:
+
+1. Download the `shepai-windows-amd64.zip` asset from the [**latest release**](https://github.com/arifszn/shepai/releases/latest)
+2. Extract the archive to your preferred location
+3. Open a terminal in the extracted directory
+
+**Verify the installation:**
+
+```powershell
 .\shepai.exe --version
 ```
+
+> **Note for Option 2:** For system-wide access, add the extracted directory to your PATH environment variable.
 
 ### Usage
 
