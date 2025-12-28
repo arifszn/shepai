@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/monstarlab/shepai/internal/models"
 )
@@ -54,7 +54,7 @@ func NewDockerCollector(containerIdentifier string) (*DockerCollector, error) {
 func (d *DockerCollector) GetSnapshot() ([]models.LogEvent, error) {
 	ctx := context.Background()
 
-	options := types.ContainerLogsOptions{
+	options := container.LogsOptions{
 		ShowStdout: true,
 		ShowStderr: true,
 		Tail:       fmt.Sprintf("%d", DefaultDockerSnapshotLines),
@@ -126,7 +126,7 @@ func (d *DockerCollector) streamWithReconnect(ch chan<- models.LogEvent) {
 			reconnectDelay = 2 * time.Second
 
 			// Container exists, start streaming
-			options := types.ContainerLogsOptions{
+			options := container.LogsOptions{
 				ShowStdout: true,
 				ShowStderr: true,
 				Tail:       "0",
