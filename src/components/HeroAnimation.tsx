@@ -52,8 +52,8 @@ export function HeroAnimation({ screenshotUrl }: HeroAnimationProps) {
         ) : (
           <motion.div
             key="screenshot"
-            initial={{ opacity: 0, scale: 0.95, y: 20, filter: "blur(4px)" }}
-            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, y: -20, transition: { duration: 0.5 } }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="w-full absolute"
