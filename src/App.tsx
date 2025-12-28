@@ -25,6 +25,7 @@ import logoSvg from "/logo.svg"
 
 function App() {
   const [platform, setPlatform] = useState<"macos" | "linux" | "windows">("macos")
+  const [uninstallPlatform, setUninstallPlatform] = useState<"macos" | "linux" | "windows">("macos")
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null)
 
   const copyToClipboard = (command: string) => {
@@ -48,6 +49,9 @@ function App() {
             </a>
             <a href="#usage" className="text-sm hover:text-primary transition-colors">
               Usage
+            </a>
+            <a href="#uninstall" className="text-sm hover:text-primary transition-colors">
+              Uninstall
             </a>
             <a href="#features" className="text-sm hover:text-primary transition-colors">
               Features
@@ -423,6 +427,89 @@ function App() {
                   title="Copy to clipboard"
                 >
                   {copiedCommand === "shepai docker app --port 8080" ? (
+                    <CheckCopy className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <Copy className="w-4 h-4 text-muted-foreground" />
+                  )}
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Uninstall Section */}
+      <section id="uninstall" className="container mx-auto px-4 py-20 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Uninstallation</h2>
+            <p className="text-muted-foreground text-lg">
+              Choose your platform to remove shepai
+            </p>
+          </div>
+
+          {/* Platform Selector */}
+          <div className="flex justify-center gap-2 mb-8 flex-wrap">
+            <Button
+              variant={uninstallPlatform === "macos" ? "default" : "outline"}
+              onClick={() => setUninstallPlatform("macos")}
+            >
+              macOS
+            </Button>
+            <Button
+              variant={uninstallPlatform === "linux" ? "default" : "outline"}
+              onClick={() => setUninstallPlatform("linux")}
+            >
+              Linux
+            </Button>
+            <Button
+              variant={uninstallPlatform === "windows" ? "default" : "outline"}
+              onClick={() => setUninstallPlatform("windows")}
+            >
+              Windows
+            </Button>
+          </div>
+
+          <Card className="overflow-hidden">
+            <CardHeader className="bg-muted/30">
+              <CardTitle>Uninstall Command</CardTitle>
+              <CardDescription>
+                {uninstallPlatform === "windows"
+                  ? "Run this command in PowerShell to remove shepai"
+                  : "Run this command in your terminal to remove shepai"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="relative group">
+                <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto pr-12">
+                  {uninstallPlatform === "windows" ? (
+                    <>
+                      <span className="text-blue-600">irm</span>{" "}
+                      <span className="text-foreground">https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.ps1</span>{" "}
+                      <span className="text-blue-600">| iex</span>
+                    </>
+                  ) : (
+                    <>
+                      <code className="text-green-600">curl -fsSL</code>{" "}
+                      <code className="text-blue-600">
+                        https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.sh
+                      </code>{" "}
+                      <code className="text-green-600">| bash</code>
+                    </>
+                  )}
+                </div>
+                <button
+                  onClick={() => copyToClipboard(
+                    uninstallPlatform === "windows"
+                      ? "irm https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.ps1 | iex"
+                      : "curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.sh | bash"
+                  )}
+                  className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                  title="Copy to clipboard"
+                >
+                  {copiedCommand === (uninstallPlatform === "windows"
+                    ? "irm https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.ps1 | iex"
+                    : "curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.sh | bash") ? (
                     <CheckCopy className="w-4 h-4 text-green-600" />
                   ) : (
                     <Copy className="w-4 h-4 text-muted-foreground" />
