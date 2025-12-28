@@ -55,23 +55,55 @@ function Get-Platform {
 function Get-LatestVersion {
     Write-Warning-Message "Fetching latest version..."
 
+    $version = $null
+
+    # Try getting version from redirect url (avoids API rate limits)
     try {
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$REPO/releases/latest"
-        $version = $response.tag_name
-
-        if ([string]::IsNullOrEmpty($version)) {
-            Write-Error-Message "Error: Could not fetch latest version"
-            exit 1
+        $request = [System.Net.WebRequest]::Create("https://github.com/$REPO/releases/latest")
+        $request.AllowAutoRedirect = $false
+        
+        try {
+            $response = $request.GetResponse()
+            $location = $response.Headers["Location"]
+            $response.Close()
         }
-
-        Write-Success "Latest version: $version"
-        return $version
+        catch [System.Net.WebException] {
+            # In some environments, 3xx might throw, catch and inspect
+            $response = $_.Exception.Response
+            if ($null -ne $response) {
+                $location = $response.Headers["Location"]
+                $response.Close()
+            }
+        }
+        
+        if ($null -ne $location) {
+             $version = $location.Split('/')[-1]
+        }
     }
     catch {
-        Write-Error-Message "Error: Failed to fetch latest version from GitHub"
-        Write-Error-Message $_.Exception.Message
+        # Ignore errors here and fall back to API
+    }
+
+    # Fallback to API if redirect failed or returned "latest" (which happens if no redirect occurred or logic failed)
+    if ([string]::IsNullOrEmpty($version) -or $version -eq "latest") {
+        try {
+            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/$REPO/releases/latest"
+            $version = $response.tag_name
+        }
+        catch {
+            Write-Error-Message "Error: Failed to fetch latest version from GitHub"
+            Write-Error-Message $_.Exception.Message
+            exit 1
+        }
+    }
+
+    if ([string]::IsNullOrEmpty($version)) {
+        Write-Error-Message "Error: Could not fetch latest version"
         exit 1
     }
+
+    Write-Success "Latest version: $version"
+    return $version
 }
 
 # Download and install

@@ -48,7 +48,13 @@ detect_platform() {
 # Get latest version
 get_latest_version() {
     echo -e "${YELLOW}Fetching latest version...${NC}"
-    VERSION=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    # Try getting version from redirect url (avoids API rate limits)
+    VERSION=$(curl -Ls -o /dev/null -w %{url_effective} "https://github.com/$REPO/releases/latest" | sed 's:.*/::')
+    
+    if [ "$VERSION" = "latest" ]; then
+      # Fallback to API if redirect method fails (e.g. no releases yet or private repo handling quirks)
+      VERSION=$(curl -s "https://api.github.com/repos/$REPO/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    fi
     
     if [ -z "$VERSION" ]; then
         echo -e "${RED}Error: Could not fetch latest version${NC}"
