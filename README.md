@@ -31,7 +31,7 @@
 
 It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/1ec10c80-6a7b-4f3d-8cdf-90e2c9ad2970" />
 
 ## Motivation
 
@@ -61,7 +61,7 @@ I wanted a way to **see logs the way they deserve to be seen** — structured, s
 - No shelling out to system commands for log streaming
 - Cross-platform support (macOS, Linux, Windows)
 
-https://github.com/user-attachments/assets/1af31674-f326-48a8-934c-2f472a49370b
+https://github.com/user-attachments/assets/5cdf34d3-1d56-40af-ae1a-05450021b3fc
 
 ## Getting Started
 
@@ -73,18 +73,34 @@ https://github.com/user-attachments/assets/1af31674-f326-48a8-934c-2f472a49370b
 curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash
 ```
 
+Verify installation:
+
+```bash
+shepai --version
+```
+
 #### Windows
 
-1. Download the `shepai-windows-amd64.zip` asset from the [latest release](https://github.com/arifszn/shepai/releases/latest)
-2. Extract it, open a terminal in the extracted directory
-
-### Verify Installation
+**PowerShell (Recommended):**
 
 ```powershell
-# macOS/Linux
-shepai --version
+irm https://raw.githubusercontent.com/arifszn/shepai/main/install.ps1 | iex
+```
 
-# Windows
+Verify installation (restart terminal first):
+
+```powershell
+shepai --version
+```
+
+**Manual Installation:**
+
+1. Download the `shepai-windows-amd64.zip` asset from the [**latest release**](https://github.com/arifszn/shepai/releases/latest)
+2. Extract it, open a terminal in the extracted directory
+
+Verify installation:
+
+```powershell
 .\shepai.exe --version
 ```
 
