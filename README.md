@@ -25,6 +25,13 @@
       <img src="https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2Farifszn%2Fshepai" />
     </a>
   </p>
+  <p align="center">
+    <a href="https://arifszn.github.io/shepai">Website</a>
+    ·
+    <a href="https://github.com/arifszn/shepai/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/arifszn/shepai/discussions">Request Feature</a>
+  </p>
 </p>
 
 **shepai (সেপাই)** is a zero-config, real‑time log viewer with JSON support that streams logs directly to your browser.
