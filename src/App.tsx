@@ -104,7 +104,7 @@ function App() {
 
           {/* Animated Hero Section */}
           <div className="mt-2 w-full">
-            <HeroAnimation screenshotUrl="/demo.png" />
+            <HeroAnimation screenshotUrl="./demo.png" />
           </div>
         </div>
       </section>
@@ -649,7 +649,7 @@ function App() {
               Transform your logs into a powerful web interface instantly.
             </p>
           </div>
-          <LazyVideo src="/preview.mp4" />
+          <LazyVideo src="./preview.mp4" />
         </div>
       </section>
 
