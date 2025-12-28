@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
+import { Play, Pause } from "lucide-react"
 
 interface LazyVideoProps {
   src: string
@@ -8,42 +9,52 @@ interface LazyVideoProps {
 
 export function LazyVideo({ src, className }: LazyVideoProps) {
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     const video = videoRef.current
-    if (!video) return
+    if (video) {
+      const handleCanPlay = () => setIsLoaded(true)
+      const handlePlay = () => setIsPlaying(true)
+      const handlePause = () => setIsPlaying(false)
 
-    // Ensure muted is strictly set for stubborn browser autoplay policies
-    video.muted = true
+      video.addEventListener("canplay", handleCanPlay)
+      video.addEventListener("play", handlePlay)
+      video.addEventListener("pause", handlePause)
 
-    const handleLoaded = () => {
-      setIsLoaded(true)
-      // Explicitly attempt to play
-      video.play().catch(() => {
-        // Silently fail if autoplay is strictly blocked (e.g. Low Power Mode)
-      })
-    }
+      // Check if it's already playing (autoplay success)
+      if (!video.paused) {
+        setIsPlaying(true)
+      }
 
-    if (video.readyState >= 3) {
-      handleLoaded()
-    } else {
-      video.addEventListener("canplay", handleLoaded)
-      video.addEventListener("loadeddata", handleLoaded)
-    }
-
-    return () => {
-      video.removeEventListener("canplay", handleLoaded)
-      video.removeEventListener("loadeddata", handleLoaded)
+      return () => {
+        video.removeEventListener("canplay", handleCanPlay)
+        video.removeEventListener("play", handlePlay)
+        video.removeEventListener("pause", handlePause)
+      }
     }
   }, [])
 
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause()
+      } else {
+        videoRef.current.play()
+      }
+    }
+  }
+
   return (
-    <div className={cn("relative rounded-xl overflow-hidden shadow-2xl border border-border/50 bg-background", className)}>
+    <div 
+      className={cn("relative rounded-xl overflow-hidden shadow-2xl border border-border/50 bg-background group cursor-pointer", className)}
+      onClick={togglePlay}
+    >
       {/* Skeleton / Placeholder */}
       <div
         className={cn(
-          "absolute inset-0 bg-muted/30 animate-pulse flex flex-col",
+          "absolute inset-0 bg-muted/30 animate-pulse flex flex-col z-10",
           isLoaded ? "opacity-0 pointer-events-none" : "opacity-100"
         )}
       >
@@ -58,6 +69,22 @@ export function LazyVideo({ src, className }: LazyVideoProps) {
 
         {/* Empty Content Body */}
         <div className="flex-1 bg-muted/10" />
+      </div>
+
+      {/* Play/Pause Overlay */}
+      <div
+        className={cn(
+          "absolute inset-0 flex items-center justify-center z-20 transition-all duration-300 bg-black/20",
+          isPlaying ? "opacity-0 group-hover:opacity-100" : "opacity-100"
+        )}
+      >
+        <div className="w-16 h-16 rounded-full bg-primary/90 text-primary-foreground flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+          {isPlaying ? (
+            <Pause className="w-8 h-8 fill-current" />
+          ) : (
+            <Play className="w-8 h-8 fill-current ml-1" />
+          )}
+        </div>
       </div>
 
       {/* Actual Video */}
