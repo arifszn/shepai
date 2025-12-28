@@ -15,22 +15,14 @@ import {
   Terminal,
   Settings,
   Zap,
-  Activity,
-  Braces,
   ListTree,
   Search,
-  Maximize2,
-  Palette,
-  Monitor,
-  RefreshCw,
-  Moon,
-  ZoomIn,
   Bug,
   Tags,
   Eye,
   Code2,
   Check,
-  Filter
+  Filter,
 } from "lucide-react"
 import logoSvg from "/logo.svg"
 
