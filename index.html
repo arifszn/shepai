@@ -1,14 +1,32 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="shepai - A zero-config log viewer for files and Docker, streamed live in your browser." />
-    <title>shepai - Zero-Config Log Viewer</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="shepai - A zero-config log viewer for files and Docker, streamed live in your browser" />
+  <title>shepai - Zero-Config Log Viewer</title>
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="shepai - Zero-Config Log Viewer" />
+  <meta property="og:description"
+    content="shepai - A zero-config log viewer for files and Docker, streamed live in your browser" />
+  <meta property="og:image" content="./demo.png" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="shepai - Zero-Config Log Viewer" />
+  <meta name="twitter:description"
+    content="shepai - A zero-config log viewer for files and Docker, streamed live in your browser" />
+  <meta name="twitter:image" content="./demo.png" />
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
