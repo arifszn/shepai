@@ -342,8 +342,8 @@ function App() {
             {/* Watch File Logs */}
             <Card className="border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4">
-                  <FileText className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <FileText className="w-6 h-6 text-primary" />
                 </div>
                 <CardTitle className="text-2xl">Watch File Logs</CardTitle>
                 <CardDescription className="text-base">
@@ -383,8 +383,8 @@ function App() {
             {/* Watch Docker Logs */}
             <Card className="border-border/50 shadow-lg hover:shadow-xl transition-all duration-300">
               <CardHeader>
-                <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
-                  <Container className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <Container className="w-6 h-6 text-primary" />
                 </div>
                 <CardTitle className="text-2xl">Watch Docker Logs</CardTitle>
                 <CardDescription className="text-base">
@@ -427,8 +427,10 @@ function App() {
             <Card className="border-border/50 bg-background/50 backdrop-blur-sm">
               <CardContent className="p-6 flex flex-col md:flex-row items-center gap-6">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                    <Settings className="w-5 h-5 text-gray-500" />
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Settings className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">
                     Options
                   </h3>
                   <p className="text-muted-foreground text-sm">
