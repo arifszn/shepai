@@ -113,24 +113,6 @@ If you prefer to install manually:
 
 > **Note for Option 2:** For system-wide access, add the extracted directory to your PATH environment variable.
 
-### Uninstallation
-
-If you need to remove shepai from your system:
-
-#### macOS & Linux
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.sh | bash
-```
-
----
-
-#### Windows
-
-```powershell
-irm https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.ps1 | iex
-```
-
 ### Usage
 
 #### File Logs
@@ -151,6 +133,24 @@ shepai docker my_container
 
 ```bash
 shepai docker my_container --port 8080
+```
+
+### Uninstallation
+
+If you need to remove shepai from your system:
+
+#### macOS & Linux
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.sh | bash
+```
+
+---
+
+#### Windows
+
+```powershell
+irm https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.ps1 | iex
 ```
 
 ## Development
