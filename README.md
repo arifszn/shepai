@@ -1,7 +1,7 @@
 <br/>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/36d6aac0-71d5-45cb-a933-9305f85de90c" width="5%">
+  <img src="https://github.com/user-attachments/assets/5694fd48-1897-4ce1-9c63-6720aac57fc7" width="5%">
   <h1 align="center">shepai</h1>
   <h4 align="center">A zero-config log viewer for files and Docker, streamed live in your browser.</h4>
 
