@@ -23,10 +23,7 @@ export function LazyVideo({ src, className }: LazyVideoProps) {
       video.addEventListener("play", handlePlay)
       video.addEventListener("pause", handlePause)
 
-      // Check if it's already playing (autoplay success)
-      if (!video.paused) {
-        setIsPlaying(true)
-      }
+
 
       return () => {
         video.removeEventListener("canplay", handleCanPlay)
@@ -95,7 +92,6 @@ export function LazyVideo({ src, className }: LazyVideoProps) {
           "w-full h-auto duration-700 ease-in-out",
           isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-105"
         )}
-        autoPlay
         loop
         muted
         playsInline
