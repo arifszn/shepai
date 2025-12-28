@@ -11,18 +11,31 @@ $REPO = "arifszn/shepai"
 $BINARY_NAME = "shepai.exe"
 
 # Color output functions
-function Write-ColorOutput($ForegroundColor) {
+function Write-ColorOutput {
+    param(
+        [string]$ForegroundColor,
+        [string]$Message
+    )
     $fc = $host.UI.RawUI.ForegroundColor
     $host.UI.RawUI.ForegroundColor = $ForegroundColor
-    if ($args) {
-        Write-Output $args
-    }
+    Write-Host $Message
     $host.UI.RawUI.ForegroundColor = $fc
 }
 
-function Write-Success { Write-ColorOutput Green $args }
-function Write-Error-Message { Write-ColorOutput Red $args }
-function Write-Warning-Message { Write-ColorOutput Yellow $args }
+function Write-Success { 
+    param([string]$Message)
+    Write-ColorOutput -ForegroundColor "Green" -Message $Message 
+}
+
+function Write-Error-Message { 
+    param([string]$Message)
+    Write-ColorOutput -ForegroundColor "Red" -Message $Message 
+}
+
+function Write-Warning-Message { 
+    param([string]$Message)
+    Write-ColorOutput -ForegroundColor "Yellow" -Message $Message 
+}
 
 # Detect architecture
 function Get-Platform {
@@ -144,7 +157,7 @@ function Install-Shepai {
         $targetPath = Join-Path $InstallDir $BINARY_NAME
         Copy-Item -Path $binaryPath -Destination $targetPath -Force
 
-        Write-Success "✓ Successfully installed shepai to $targetPath"
+        Write-Success "[OK] Successfully installed shepai to $targetPath"
 
         # Add to PATH if not already present
         $userPath = [System.Environment]::GetEnvironmentVariable("Path", "User")
@@ -155,11 +168,11 @@ function Install-Shepai {
                 "$userPath;$InstallDir",
                 "User"
             )
-            Write-Success "✓ Added to PATH. Please restart your terminal for changes to take effect."
+            Write-Success "[OK] Added to PATH. Please restart your terminal for changes to take effect."
         }
 
         # Verify installation
-        Write-Success "✓ Installation complete!"
+        Write-Success "[OK] Installation complete!"
         Write-Success "Run 'shepai --help' to get started (restart your terminal first)"
     }
     finally {

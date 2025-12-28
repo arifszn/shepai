@@ -37,7 +37,7 @@ It supports both application log files and Docker container logs, runs entirely 
 
 I built **shepai** because I genuinely dislike debugging logs in the terminal.
 
-Modern application logs are no longer simple strings — they’re often deeply nested JSON, long stack traces, or structured logs that wrap across multiple lines. In a terminal, this quickly becomes painful.
+Modern application logs are no longer simple strings — they're often deeply nested JSON, long stack traces, or structured logs that wrap across multiple lines. In a terminal, this quickly becomes painful.
 
 I wanted a way to **see logs the way they deserve to be seen** — structured, searchable, expandable, and persistent on screen — without introducing heavy log infrastructure or changing application code.
 
@@ -71,8 +71,6 @@ Choose the installation method for your operating system:
 
 #### macOS & Linux
 
-Run the automated installation script:
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash
 ```
@@ -88,8 +86,6 @@ shepai --version
 #### Windows
 
 ##### Option 1: PowerShell Script (Recommended)
-
-Run the automated installation script in PowerShell:
 
 ```powershell
 irm https://raw.githubusercontent.com/arifszn/shepai/main/install.ps1 | iex
@@ -116,6 +112,24 @@ If you prefer to install manually:
 ```
 
 > **Note for Option 2:** For system-wide access, add the extracted directory to your PATH environment variable.
+
+### Uninstallation
+
+If you need to remove shepai from your system:
+
+#### macOS & Linux
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.sh | bash
+```
+
+---
+
+#### Windows
+
+```powershell
+irm https://raw.githubusercontent.com/arifszn/shepai/main/uninstall.ps1 | iex
+```
 
 ### Usage
 
