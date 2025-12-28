@@ -31,7 +31,7 @@
 
 It supports both application log files and Docker container logs, runs entirely locally, and exposes a clean web dashboard at `http://localhost:4040`.
 
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/95231578-4ef4-491a-9a84-14470a0b2cf5" />
+<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/559ea7b4-6eda-41d2-8297-d7df18463eda" />
 
 ## Motivation
 
