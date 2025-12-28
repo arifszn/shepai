@@ -1,13 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- Background -->
-  <rect width="32" height="32" rx="6" fill="#1e293b"/>
-
-  <!-- Log lines - representing log entries -->
-  <rect x="6" y="8" width="14" height="2" rx="1" fill="#60a5fa"/>
-  <rect x="6" y="13" width="20" height="2" rx="1" fill="#60a5fa"/>
-  <rect x="6" y="18" width="18" height="2" rx="1" fill="#60a5fa"/>
-  <rect x="6" y="23" width="16" height="2" rx="1" fill="#60a5fa"/>
-
-  <!-- Accent dot - like a cursor or indicator -->
-  <circle cx="25" cy="9" r="2" fill="#22d3ee"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="24" fill="#1a1a1a"/>
+  <path d="M32 48h16v8H32z" fill="#4ade80"/>
+  <path d="M32 64h24v8H32z" fill="#4ade80"/>
+  <path d="M32 80h20v8H32z" fill="#4ade80"/>
+  <path d="M64 40h48v8H64z" fill="#fff"/>
+  <path d="M64 56h40v8H64z" fill="#fff"/>
+  <path d="M64 72h36v8H64z" fill="#fff"/>
+  <path d="M64 88h32v8H64z" fill="#fff"/>
 </svg>
