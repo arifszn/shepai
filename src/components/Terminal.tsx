@@ -14,7 +14,7 @@ export function Terminal({ className, onComplete }: TerminalProps) {
     if (!typedRef.current) return
 
     const typed = new Typed(typedRef.current, {
-      strings: ["shepai file sample.log"],
+      strings: ["shepai file app.log"],
       typeSpeed: 50,
       backSpeed: 30,
       smartBackspace: true,

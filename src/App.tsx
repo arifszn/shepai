@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 import { HeroAnimation } from "@/components/HeroAnimation"
 import {
-  Download,
   Play,
   FileText,
   Container,
@@ -19,12 +18,13 @@ import {
   Check,
   ChevronRight,
   Copy,
-  Check as CheckCopy
+  Check as CheckCopy,
+  Terminal
 } from "lucide-react"
 import logoSvg from "/logo.svg"
 
 function App() {
-  const [platform, setPlatform] = useState<"macos" | "windows">("macos")
+  const [platform, setPlatform] = useState<"macos" | "linux" | "windows">("macos")
   const [copiedCommand, setCopiedCommand] = useState<string | null>(null)
 
   const copyToClipboard = (command: string) => {
@@ -113,12 +113,18 @@ function App() {
           </div>
 
           {/* Platform Selector */}
-          <div className="flex justify-center gap-2 mb-8">
+          <div className="flex justify-center gap-2 mb-8 flex-wrap">
             <Button
               variant={platform === "macos" ? "default" : "outline"}
               onClick={() => setPlatform("macos")}
             >
-              macOS & Linux
+              macOS
+            </Button>
+            <Button
+              variant={platform === "linux" ? "default" : "outline"}
+              onClick={() => setPlatform("linux")}
+            >
+              Linux
             </Button>
             <Button
               variant={platform === "windows" ? "default" : "outline"}
@@ -128,88 +134,183 @@ function App() {
             </Button>
           </div>
 
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Download className="w-5 h-5" />
+          <Card className="mb-8 overflow-hidden">
+            <CardHeader className="bg-muted/30">
+              <CardTitle>
                 Quick Install
               </CardTitle>
               <CardDescription>
-                {platform === "macos"
-                  ? "Run this command in your terminal"
-                  : "Download and extract the zip file"}
+                {platform === "windows" 
+                  ? "Choose the method that works best for you"
+                  : "Run this command in your terminal"}
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              {platform === "macos" ? (
-                <div className="relative group">
-                  <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto pr-12">
-                    <code className="text-green-600">curl -fsSL</code>{" "}
-                    <code className="text-blue-600">
-                      https://raw.githubusercontent.com/arifszn/shepai/main/install.sh
-                    </code>{" "}
-                    <code className="text-green-600">| bash</code>
+            <CardContent className="p-6">
+              {(platform === "macos" || platform === "linux") ? (
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-sm font-medium mb-3 text-muted-foreground flex items-center gap-2">
+                      <Terminal className="w-4 h-4" />
+                      Install Command
+                    </h3>
+                    <div className="relative group">
+                      <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto pr-12">
+                        <code className="text-green-600">curl -fsSL</code>{" "}
+                        <code className="text-blue-600">
+                          https://raw.githubusercontent.com/arifszn/shepai/main/install.sh
+                        </code>{" "}
+                        <code className="text-green-600">| bash</code>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard("curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash")}
+                        className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                        title="Copy to clipboard"
+                      >
+                        {copiedCommand === "curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash" ? (
+                          <CheckCopy className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => copyToClipboard("curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-background/80 transition-colors"
-                    title="Copy to clipboard"
-                  >
-                    {copiedCommand === "curl -fsSL https://raw.githubusercontent.com/arifszn/shepai/main/install.sh | bash" ? (
-                      <CheckCopy className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <Copy className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  <ol className="list-decimal list-inside space-y-2 text-sm">
-                    <li>
-                      Download the{" "}
-                      <a
-                        href="https://github.com/arifszn/shepai/releases/latest"
-                        className="text-primary hover:underline"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                <div className="space-y-10">
+                  {/* Windows Option 1 */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center text-primary">
+                        <span className="text-xs font-bold">1</span>
+                      </div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <Terminal className="w-5 h-5" />
+                        PowerShell Script (Recommended)
+                      </h3>
+                    </div>
+                    
+                    <div className="relative group mb-4">
+                      <div className="bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto pr-12">
+                        <span className="text-blue-600">irm</span>{" "}
+                        <span className="text-foreground">https://raw.githubusercontent.com/arifszn/shepai/main/install.ps1</span>{" "}
+                        <span className="text-blue-600">| iex</span>
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard("irm https://raw.githubusercontent.com/arifszn/shepai/main/install.ps1 | iex")}
+                        className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                        title="Copy to clipboard"
                       >
-                        shepai-windows-amd64.zip
-                      </a>{" "}
-                      asset
-                    </li>
-                    <li>Extract it to a folder of your choice</li>
-                    <li>Open a terminal in the extracted directory</li>
-                  </ol>
+                        {copiedCommand === "irm https://raw.githubusercontent.com/arifszn/shepai/main/install.ps1 | iex" ? (
+                          <CheckCopy className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="bg-muted/50 rounded-lg p-4 border text-sm">
+                      <p className="font-medium mb-2">Verify the installation (restart your terminal first):</p>
+                      <div className="relative group">
+                        <code className="font-mono block bg-background px-3 py-2 rounded border">shepai --version</code>
+                        <button
+                          onClick={() => copyToClipboard("shepai --version")}
+                          className="absolute right-2 top-2 p-1.5 rounded-md hover:bg-muted transition-colors"
+                        >
+                          {copiedCommand === "shepai --version" ? (
+                            <CheckCopy className="w-3 h-3 text-green-600" />
+                          ) : (
+                            <Copy className="w-3 h-3 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-border" />
+
+                  {/* Windows Option 2 */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center text-primary">
+                        <span className="text-xs font-bold">2</span>
+                      </div>
+                      <h3 className="font-semibold text-lg">Manual Installation</h3>
+                    </div>
+
+                    <div className="space-y-4 mb-6">
+                      <ol className="list-decimal list-inside space-y-3 text-sm ml-1">
+                        <li>
+                          Download the{" "}
+                          <a
+                            href="https://github.com/arifszn/shepai/releases/latest"
+                            className="text-primary hover:underline font-medium"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            shepai-windows-amd64.zip
+                          </a>{" "}
+                          asset from the latest release
+                        </li>
+                        <li>Extract the archive to your preferred location</li>
+                        <li>Open a terminal in the extracted directory</li>
+                      </ol>
+                    </div>
+
+                    <div className="bg-muted/50 rounded-lg p-4 border text-sm mb-4">
+                      <p className="font-medium mb-2">Verify the installation:</p>
+                      <div className="relative group">
+                        <code className="font-mono block bg-background px-3 py-2 rounded border">.\shepai.exe --version</code>
+                        <button
+                          onClick={() => copyToClipboard(".\\shepai.exe --version")}
+                          className="absolute right-2 top-2 p-1.5 rounded-md hover:bg-muted transition-colors"
+                        >
+                          {copiedCommand === ".\\shepai.exe --version" ? (
+                            <CheckCopy className="w-3 h-3 text-green-600" />
+                          ) : (
+                            <Copy className="w-3 h-3 text-muted-foreground" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 p-3 rounded-lg text-sm border border-yellow-200 dark:border-yellow-900/50">
+                      <strong className="font-semibold">Note:</strong> For system-wide access, add the extracted directory to your PATH environment variable.
+                    </div>
+                  </div>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Verify Installation */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Verify Installation</CardTitle>
-              <CardDescription>Make sure shepai is installed correctly</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="relative group">
-                <div className="bg-muted p-4 rounded-lg font-mono text-sm pr-12">
-                  <code>{platform === "macos" ? "shepai --version" : ".\\shepai.exe --version"}</code>
+          
+          {/* Verify Installation - Only for macOS/Linux here since Windows has it embedded */}
+          {(platform === "macos" || platform === "linux") && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Verify Installation</CardTitle>
+                <CardDescription>Make sure shepai is installed correctly</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="relative group">
+                  <div className="bg-muted p-4 rounded-lg font-mono text-sm pr-12">
+                    <code>shepai --version</code>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard("shepai --version")}
+                    className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                    title="Copy to clipboard"
+                  >
+                    {copiedCommand === "shepai --version" ? (
+                      <CheckCopy className="w-4 h-4 text-green-600" />
+                    ) : (
+                      <Copy className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </button>
                 </div>
-                <button
-                  onClick={() => copyToClipboard(platform === "macos" ? "shepai --version" : ".\\shepai.exe --version")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-background/80 transition-colors"
-                  title="Copy to clipboard"
-                >
-                  {copiedCommand === (platform === "macos" ? "shepai --version" : ".\\shepai.exe --version") ? (
-                    <CheckCopy className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <Copy className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </section>
 
@@ -243,7 +344,7 @@ function App() {
                   </div>
                   <button
                     onClick={() => copyToClipboard("shepai file storage/logs/app.log")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                    className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
                     title="Copy to clipboard"
                   >
                     {copiedCommand === "shepai file storage/logs/app.log" ? (
@@ -281,7 +382,7 @@ function App() {
                   </div>
                   <button
                     onClick={() => copyToClipboard("shepai docker my_container")}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                    className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
                     title="Copy to clipboard"
                   >
                     {copiedCommand === "shepai docker my_container" ? (
@@ -318,7 +419,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => copyToClipboard("shepai docker app --port 8080")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                  className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
                   title="Copy to clipboard"
                 >
                   {copiedCommand === "shepai docker app --port 8080" ? (
