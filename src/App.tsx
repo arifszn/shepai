@@ -678,6 +678,7 @@ function App() {
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><a href="#install" className="hover:text-primary transition-colors">Install</a></li>
                 <li><a href="#usage" className="hover:text-primary transition-colors">Usage</a></li>
+                <li><a href="#uninstall" className="hover:text-primary transition-colors">Uninstall</a></li>
                 <li><a href="#features" className="hover:text-primary transition-colors">Features</a></li>
               </ul>
             </div>
