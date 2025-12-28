@@ -61,7 +61,7 @@ I wanted a way to **see logs the way they deserve to be seen** — structured, s
 - No shelling out to system commands for log streaming
 - Cross-platform support (macOS, Linux, Windows)
 
-https://github.com/user-attachments/assets/5cdf34d3-1d56-40af-ae1a-05450021b3fc
+https://github.com/user-attachments/assets/46c1041d-d015-4004-b324-180abb030917
 
 ## Getting Started
 
@@ -81,7 +81,7 @@ shepai --version
 
 #### Windows
 
-**PowerShell (Recommended):**
+##### PowerShell (Recommended)
 
 ```powershell
 irm https://raw.githubusercontent.com/arifszn/shepai/main/install.ps1 | iex
@@ -93,7 +93,7 @@ Verify installation (restart terminal first):
 shepai --version
 ```
 
-**Manual Installation:**
+##### Manual Installation
 
 1. Download the `shepai-windows-amd64.zip` asset from the [**latest release**](https://github.com/arifszn/shepai/releases/latest)
 2. Extract it, open a terminal in the extracted directory
