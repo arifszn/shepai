@@ -12,10 +12,29 @@ export function LazyVideo({ src, className }: LazyVideoProps) {
 
   useEffect(() => {
     const video = videoRef.current
-    if (video) {
-      const handleCanPlay = () => setIsLoaded(true)
-      video.addEventListener("canplay", handleCanPlay)
-      return () => video.removeEventListener("canplay", handleCanPlay)
+    if (!video) return
+
+    // Ensure muted is strictly set for stubborn browser autoplay policies
+    video.muted = true
+
+    const handleLoaded = () => {
+      setIsLoaded(true)
+      // Explicitly attempt to play
+      video.play().catch(() => {
+        // Silently fail if autoplay is strictly blocked (e.g. Low Power Mode)
+      })
+    }
+
+    if (video.readyState >= 3) {
+      handleLoaded()
+    } else {
+      video.addEventListener("canplay", handleLoaded)
+      video.addEventListener("loadeddata", handleLoaded)
+    }
+
+    return () => {
+      video.removeEventListener("canplay", handleLoaded)
+      video.removeEventListener("loadeddata", handleLoaded)
     }
   }, [])
 

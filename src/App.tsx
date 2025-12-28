@@ -598,9 +598,9 @@ function App() {
                 description: "Filter logs by severity levels (Error, Warning, Info, Debug) to focus on what matters."
               }
             ].map((feature, index) => (
-              <Card key={index} className="border-none shadow-sm bg-muted/30">
+              <Card key={index} className="shadow-sm">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-background flex items-center justify-center mb-4 shadow-sm">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
                   <CardTitle className="text-lg">{feature.title}</CardTitle>
