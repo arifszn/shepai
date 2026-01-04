@@ -26,6 +26,8 @@
     </a>
   </p>
   <p align="center">
+    <a href="https://arifszn.github.io/shepai">Website</a>
+    ·
     <a href="https://github.com/arifszn/shepai/issues">Report Bug</a>
     ·
     <a href="https://github.com/arifszn/shepai/discussions">Request Feature</a>
