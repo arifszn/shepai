@@ -218,21 +218,22 @@ function App() {
                       </button>
                     </div>
 
-                    <div className="bg-muted/50 rounded-lg p-4 border text-sm">
-                      <p className="font-medium mb-2">Verify the installation (restart your terminal first):</p>
+                    <div className="mt-4">
+                      <p className="font-medium mb-2 text-sm">Verify the installation (restart your terminal first):</p>
                       <div className="relative group">
-                        <div className="font-mono block bg-background px-3 py-2 rounded border">
+                        <div className="font-mono block bg-muted p-4 rounded-lg text-sm overflow-x-auto pr-12">
                           <span className="text-green-600">shepai</span>{" "}
                           <span className="text-purple-600">--version</span>
                         </div>
                         <button
                           onClick={() => copyToClipboard("shepai --version")}
-                          className="absolute right-2 top-2 p-1.5 rounded-md hover:bg-muted transition-colors"
+                          className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                          title="Copy to clipboard"
                         >
                           {copiedCommand === "shepai --version" ? (
-                            <CheckCopy className="w-3 h-3 text-green-600" />
+                            <CheckCopy className="w-4 h-4 text-green-600" />
                           ) : (
-                            <Copy className="w-3 h-3 text-muted-foreground" />
+                            <Copy className="w-4 h-4 text-muted-foreground" />
                           )}
                         </button>
                       </div>
@@ -269,21 +270,22 @@ function App() {
                       </ol>
                     </div>
 
-                    <div className="bg-muted/50 rounded-lg p-4 border text-sm mb-4">
-                      <p className="font-medium mb-2">Verify the installation:</p>
+                    <div className="mt-4 mb-4">
+                      <p className="font-medium mb-2 text-sm">Verify the installation:</p>
                       <div className="relative group">
-                        <div className="font-mono block bg-background px-3 py-2 rounded border">
+                        <div className="font-mono block bg-muted p-4 rounded-lg text-sm overflow-x-auto pr-12">
                           <span className="text-green-600">.\shepai.exe</span>{" "}
                           <span className="text-purple-600">--version</span>
                         </div>
                         <button
                           onClick={() => copyToClipboard(".\\shepai.exe --version")}
-                          className="absolute right-2 top-2 p-1.5 rounded-md hover:bg-muted transition-colors"
+                          className="absolute right-2 top-2 p-2 rounded-md hover:bg-background/80 transition-colors"
+                          title="Copy to clipboard"
                         >
                           {copiedCommand === ".\\shepai.exe --version" ? (
-                            <CheckCopy className="w-3 h-3 text-green-600" />
+                            <CheckCopy className="w-4 h-4 text-green-600" />
                           ) : (
-                            <Copy className="w-3 h-3 text-muted-foreground" />
+                            <Copy className="w-4 h-4 text-muted-foreground" />
                           )}
                         </button>
                       </div>
