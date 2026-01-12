@@ -24,6 +24,7 @@ import {
   Check,
   Filter,
 } from "lucide-react"
+import { FaApple, FaLinux, FaWindows } from "react-icons/fa"
 import logoSvg from "/logo.svg"
 
 function App() {
@@ -128,18 +129,21 @@ function App() {
               variant={platform === "macos" ? "default" : "outline"}
               onClick={() => setPlatform("macos")}
             >
+              <FaApple className="w-4 h-4 mr-2" />
               macOS
             </Button>
             <Button
               variant={platform === "linux" ? "default" : "outline"}
               onClick={() => setPlatform("linux")}
             >
+              <FaLinux className="w-4 h-4 mr-2" />
               Linux
             </Button>
             <Button
               variant={platform === "windows" ? "default" : "outline"}
               onClick={() => setPlatform("windows")}
             >
+              <FaWindows className="w-4 h-4 mr-2" />
               Windows
             </Button>
           </div>
@@ -492,18 +496,21 @@ function App() {
               variant={uninstallPlatform === "macos" ? "default" : "outline"}
               onClick={() => setUninstallPlatform("macos")}
             >
+              <FaApple className="w-4 h-4 mr-2" />
               macOS
             </Button>
             <Button
               variant={uninstallPlatform === "linux" ? "default" : "outline"}
               onClick={() => setUninstallPlatform("linux")}
             >
+              <FaLinux className="w-4 h-4 mr-2" />
               Linux
             </Button>
             <Button
               variant={uninstallPlatform === "windows" ? "default" : "outline"}
               onClick={() => setUninstallPlatform("windows")}
             >
+              <FaWindows className="w-4 h-4 mr-2" />
               Windows
             </Button>
           </div>
