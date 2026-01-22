@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Braces, Eye, EyeOff, Layers, List, Minus, Moon, Pause, Play, Plus, Search, Sun, Trash2, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Braces, Eye, EyeOff, Layers, Minus, Moon, Pause, Play, Plus, Search, Sun, Trash2, X } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
 
@@ -114,7 +114,7 @@ export const LogViewerHeader = ({
                 </>
               ) : (
                 <>
-                  <List className="w-3 h-3" />
+                  <Layers className="w-3 h-3" />
                   <span className="ml-1.5 hidden sm:inline">Traces: Raw</span>
                 </>
               )}
