@@ -19,7 +19,7 @@ export default function LogViewer({}: LogViewerProps) {
   const [isPaused, setIsPaused] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showTimestamps, setShowTimestamps] = useState(() => getStorageItem('logViewer.showTimestamps', true))
-  const [stackTraceViewEnabled, setStackTraceViewEnabled] = useState(() => getStorageItem('logViewer.stackTraceViewEnabled', true))
+  const [stackTraceViewEnabled, setStackTraceViewEnabled] = useState(() => getStorageItem('logViewer.stackTraceViewEnabled', false))
   const [autoScroll, setAutoScroll] = useState(() => getStorageItem('logViewer.autoScroll', true))
   const [connected, setConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
