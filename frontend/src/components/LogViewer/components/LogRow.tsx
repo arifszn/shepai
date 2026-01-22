@@ -43,6 +43,10 @@ export const LogRow = ({
 }: LogRowProps) => {
   const isExpanded = expanded
   const hasDetails = log.details.length > 0
+  const showExpandButton = hasDetails
+  
+  const textToDisplay = log.header
+
   const severity: LogLevel = getSeverityLevel(log.header)
   const hasJson = !!tryParseJSON(log.header)
   const showJsonViewer = jsonViewerEnabled ?? jsonViewerGlobalEnabled
@@ -85,7 +89,7 @@ export const LogRow = ({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-2">
-            {hasDetails ? (
+            {showExpandButton ? (
               <button
                 type="button"
                 onClick={(e) => {
@@ -119,7 +123,7 @@ export const LogRow = ({
 
             <span className="flex-1 break-words font-mono text-[11px] leading-relaxed">
               <LogMessage
-                text={log.header}
+                text={textToDisplay}
                 query={searchQuery}
                 severity={severity}
                 showJsonViewer={showJsonViewer}
