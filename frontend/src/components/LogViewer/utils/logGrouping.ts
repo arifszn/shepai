@@ -59,13 +59,15 @@ export const looksLikeContinuationLine = (line: string): boolean => {
   return false
 }
 
-export const groupLogEventsForDisplay = (events: LogEvent[]): DisplayLogEvent[] => {
+export const groupLogEventsForDisplay = (events: LogEvent[], groupingEnabled: boolean = true): DisplayLogEvent[] => {
   const out: DisplayLogEvent[] = []
   let counter = 0
 
   for (const ev of events) {
     const line = ev.message ?? ''
-    const shouldStartNew =
+    
+    // If grouping is disabled, every line starts a new entry
+    const shouldStartNew = !groupingEnabled || 
       looksLikeNewEntryLine(line) ||
       out.length === 0 ||
       !looksLikeContinuationLine(line)

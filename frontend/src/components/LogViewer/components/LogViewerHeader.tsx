@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Braces, Eye, EyeOff, Minus, Moon, Pause, Play, Plus, Search, Sun, Trash2, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Braces, Eye, EyeOff, Layers, List, Minus, Moon, Pause, Play, Plus, Search, Sun, Trash2, X } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Input } from '../../ui/input'
 
@@ -6,6 +6,9 @@ interface LogViewerHeaderProps {
   sourceName: string
   showTimestamps: boolean
   onToggleTimestamps: () => void
+
+  stackTraceViewEnabled: boolean
+  onToggleStackTraceView: () => void
 
   autoScroll: boolean
   onToggleAutoScroll: () => void
@@ -38,6 +41,8 @@ export const LogViewerHeader = ({
   sourceName,
   showTimestamps,
   onToggleTimestamps,
+  stackTraceViewEnabled,
+  onToggleStackTraceView,
   autoScroll,
   onToggleAutoScroll,
   jsonViewerGlobalEnabled,
@@ -91,6 +96,26 @@ export const LogViewerHeader = ({
                 <>
                   <Eye className="w-3 h-3" />
                   <span className="ml-1.5 hidden sm:inline">Timestamps</span>
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onToggleStackTraceView}
+              className="h-7 px-2.5 text-[11px] whitespace-nowrap"
+              title={stackTraceViewEnabled ? 'Disable grouping (show raw lines)' : 'Enable grouping (combine stack traces)'}
+            >
+              {stackTraceViewEnabled ? (
+                <>
+                  <Layers className="w-3 h-3" />
+                  <span className="ml-1.5 hidden sm:inline">Traces: Grouped</span>
+                </>
+              ) : (
+                <>
+                  <List className="w-3 h-3" />
+                  <span className="ml-1.5 hidden sm:inline">Traces: Raw</span>
                 </>
               )}
             </Button>

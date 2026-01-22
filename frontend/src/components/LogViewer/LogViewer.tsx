@@ -19,6 +19,7 @@ export default function LogViewer({}: LogViewerProps) {
   const [isPaused, setIsPaused] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showTimestamps, setShowTimestamps] = useState(() => getStorageItem('logViewer.showTimestamps', true))
+  const [stackTraceViewEnabled, setStackTraceViewEnabled] = useState(() => getStorageItem('logViewer.stackTraceViewEnabled', true))
   const [autoScroll, setAutoScroll] = useState(() => getStorageItem('logViewer.autoScroll', true))
   const [connected, setConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -51,6 +52,10 @@ export default function LogViewer({}: LogViewerProps) {
   useEffect(() => {
     localStorage.setItem('logViewer.showTimestamps', showTimestamps.toString())
   }, [showTimestamps])
+
+  useEffect(() => {
+    localStorage.setItem('logViewer.stackTraceViewEnabled', stackTraceViewEnabled.toString())
+  }, [stackTraceViewEnabled])
 
   useEffect(() => {
     localStorage.setItem('logViewer.autoScroll', autoScroll.toString())
@@ -160,7 +165,7 @@ export default function LogViewer({}: LogViewerProps) {
     setZoomLevel((prev) => Math.max(prev - 0.1, 0.5)) // Min 50%
   }
 
-  const displayLogs = useMemo(() => groupLogEventsForDisplay(logs), [logs])
+  const displayLogs = useMemo(() => groupLogEventsForDisplay(logs, stackTraceViewEnabled), [logs, stackTraceViewEnabled])
 
   // First apply search filter only (for counting badges)
   const searchFilteredLogs = useMemo(() => displayLogs.filter((log) => {
@@ -207,6 +212,8 @@ export default function LogViewer({}: LogViewerProps) {
         sourceName={sourceName}
         showTimestamps={showTimestamps}
         onToggleTimestamps={() => setShowTimestamps(!showTimestamps)}
+        stackTraceViewEnabled={stackTraceViewEnabled}
+        onToggleStackTraceView={() => setStackTraceViewEnabled(!stackTraceViewEnabled)}
         autoScroll={autoScroll}
         onToggleAutoScroll={() => setAutoScroll(!autoScroll)}
         jsonViewerGlobalEnabled={jsonViewerGlobalEnabled}
